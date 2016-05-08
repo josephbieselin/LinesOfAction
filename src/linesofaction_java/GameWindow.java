@@ -5,19 +5,95 @@
  */
 package linesofaction_java;
 
+//import javax.swing.*;
+        
 /**
  *
  * @author joebi
  */
 public class GameWindow extends javax.swing.JFrame {
 
+    // PRIVATE OBJECT VARIABLES
+    private Player P1;
+    private Player P2;
+    
+    // Who's turn is it?
+    private Player currentPlayer;
+    // Is userPlayer the Black (P1) or White (P2) Player?
+    private Player userPlayer;
+    // compPlayer is the opposite of userPlayer
+    private Player compPlayer;
+    
+    // The Game Board is a square matrix of boardSize-by-boardSize
+    final public int boardSize = 5;
+    private final Piece board[][];
+    
+    // What is the current piece chosen to potentially move?
+    private Piece selectedPiece;
+    
+    // What is the position the Player wants to move selectedPiece to
+    private int newX = -1; // -1 indicates no new position yet
+    private int newY = -1; // -1 indicates no new position yet
+    // END OF OBJECT VARIABLES
+    
     /**
      * Creates new form GameWindow
      */
     public GameWindow() {
         initComponents();
+        
+        // Initialize Player 1 and 2 and set currentPlayer to P1
+        P1 = new Player(1);
+        P2 = new Player(2);
+        currentPlayer = P1;
+        
+        // User has not selected which Player to be yet
+        userPlayer = null;
+        compPlayer = null;        
+        
+        // Initialize the 2D board with null
+        board = new Piece[boardSize][boardSize];
+        
+        for (int i = 0; i < boardSize; ++i)
+            for (int j = 0; j < boardSize; ++j)
+                board[i][j] = null;
+        
+        // Initialize game Pieces to the board and respective Players
+        setPieces();
+        
+        // No Piece on the board has been selected yet
+        selectedPiece = null;
     }
 
+    // Set Pieces on the board and to the Players according to Lines of Actions rules
+    public void setPieces() {
+        Piece tempPiece;
+        
+        for (int i = 1; i < (boardSize - 1); ++i) {
+            /* Player 1 - Black Player (x on the board) */
+            // Top Row
+            tempPiece = new Piece(0, i, P1);
+            board[0][i] = tempPiece;
+            P1.addPiece(tempPiece);
+            // Bottom Row
+            tempPiece = new Piece(boardSize - 1, i, P1);
+            board[boardSize - 1][i] = tempPiece;
+            P1.addPiece(tempPiece);
+            
+            /* Player 2 - White Player (o on the board) */
+            // Left Column
+            tempPiece = new Piece(i, 0, P2);
+            board[i][0] = tempPiece;
+            P2.addPiece(tempPiece);
+            // Right Column
+            tempPiece = new Piece(i, boardSize - 1, P2);
+            board[i][boardSize - 1] = tempPiece;
+            P2.addPiece(tempPiece);
+        }
+        
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,33 +103,8 @@ public class GameWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        BOARD_0_0 = new javax.swing.JPanel();
-        BOARD_0_1 = new javax.swing.JPanel();
-        BOARD_0_2 = new javax.swing.JPanel();
-        BOARD_0_3 = new javax.swing.JPanel();
-        BOARD_0_4 = new javax.swing.JPanel();
-        BOARD_1_0 = new javax.swing.JPanel();
-        BOARD_1_1 = new javax.swing.JPanel();
-        BOARD_1_2 = new javax.swing.JPanel();
-        BOARD_1_3 = new javax.swing.JPanel();
-        BOARD_1_4 = new javax.swing.JPanel();
-        BOARD_2_0 = new javax.swing.JPanel();
-        BOARD_2_1 = new javax.swing.JPanel();
-        BOARD_2_2 = new javax.swing.JPanel();
-        BOARD_2_3 = new javax.swing.JPanel();
-        BOARD_2_4 = new javax.swing.JPanel();
-        BOARD_3_0 = new javax.swing.JPanel();
-        BOARD_3_1 = new javax.swing.JPanel();
-        BOARD_3_2 = new javax.swing.JPanel();
-        BOARD_3_3 = new javax.swing.JPanel();
-        BOARD_3_4 = new javax.swing.JPanel();
-        BOARD_4_0 = new javax.swing.JPanel();
-        BOARD_4_1 = new javax.swing.JPanel();
-        BOARD_4_2 = new javax.swing.JPanel();
-        BOARD_4_3 = new javax.swing.JPanel();
-        BOARD_4_4 = new javax.swing.JPanel();
-        BLACK_BUTTON = new javax.swing.JButton();
-        WHITE_BUTTON = new javax.swing.JButton();
+        X_BUTTON = new javax.swing.JButton();
+        O_BUTTON = new javax.swing.JButton();
         RESET_BUTTON = new javax.swing.JButton();
         DISPLAY_WINNER_TEXT_FIELD = new javax.swing.JTextField();
         MAX_DEPTH_GAME_TREE_REACHED_TEXT = new javax.swing.JTextField();
@@ -68,505 +119,56 @@ public class GameWindow extends javax.swing.JFrame {
         TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD = new javax.swing.JTextField();
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT = new javax.swing.JTextField();
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD = new javax.swing.JTextField();
+        BOARD_0_1 = new javax.swing.JToggleButton();
+        BOARD_0_2 = new javax.swing.JToggleButton();
+        BOARD_0_3 = new javax.swing.JToggleButton();
+        BOARD_0_4 = new javax.swing.JToggleButton();
+        BOARD_1_0 = new javax.swing.JToggleButton();
+        BOARD_1_1 = new javax.swing.JToggleButton();
+        BOARD_1_2 = new javax.swing.JToggleButton();
+        BOARD_1_3 = new javax.swing.JToggleButton();
+        BOARD_1_4 = new javax.swing.JToggleButton();
+        BOARD_2_0 = new javax.swing.JToggleButton();
+        BOARD_3_0 = new javax.swing.JToggleButton();
+        BOARD_4_0 = new javax.swing.JToggleButton();
+        BOARD_2_1 = new javax.swing.JToggleButton();
+        BOARD_2_2 = new javax.swing.JToggleButton();
+        BOARD_2_3 = new javax.swing.JToggleButton();
+        BOARD_2_4 = new javax.swing.JToggleButton();
+        BOARD_3_1 = new javax.swing.JToggleButton();
+        BOARD_3_2 = new javax.swing.JToggleButton();
+        BOARD_3_3 = new javax.swing.JToggleButton();
+        BOARD_3_4 = new javax.swing.JToggleButton();
+        BOARD_4_1 = new javax.swing.JToggleButton();
+        BOARD_4_2 = new javax.swing.JToggleButton();
+        BOARD_4_3 = new javax.swing.JToggleButton();
+        BOARD_4_4 = new javax.swing.JToggleButton();
+        BOARD_0_0 = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
-        BOARD_0_0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_0_0.setToolTipText("");
-        BOARD_0_0.setName("BOARD_0_0"); // NOI18N
-        BOARD_0_0.addMouseListener(new java.awt.event.MouseAdapter() {
+        X_BUTTON.setText("1 - x");
+        X_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_0_0MouseClicked(evt);
+                X_BUTTONMouseClicked(evt);
             }
         });
-
-        javax.swing.GroupLayout BOARD_0_0Layout = new javax.swing.GroupLayout(BOARD_0_0);
-        BOARD_0_0.setLayout(BOARD_0_0Layout);
-        BOARD_0_0Layout.setHorizontalGroup(
-            BOARD_0_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_0_0Layout.setVerticalGroup(
-            BOARD_0_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_0_1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_0_1.setName("BOARD_0_1"); // NOI18N
-        BOARD_0_1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_0_1MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_0_1Layout = new javax.swing.GroupLayout(BOARD_0_1);
-        BOARD_0_1.setLayout(BOARD_0_1Layout);
-        BOARD_0_1Layout.setHorizontalGroup(
-            BOARD_0_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_0_1Layout.setVerticalGroup(
-            BOARD_0_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_0_2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_0_2.setName("BOARD_0_2"); // NOI18N
-        BOARD_0_2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_0_2MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_0_2Layout = new javax.swing.GroupLayout(BOARD_0_2);
-        BOARD_0_2.setLayout(BOARD_0_2Layout);
-        BOARD_0_2Layout.setHorizontalGroup(
-            BOARD_0_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_0_2Layout.setVerticalGroup(
-            BOARD_0_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_0_3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_0_3.setName("BOARD_0_3"); // NOI18N
-        BOARD_0_3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_0_3MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_0_3Layout = new javax.swing.GroupLayout(BOARD_0_3);
-        BOARD_0_3.setLayout(BOARD_0_3Layout);
-        BOARD_0_3Layout.setHorizontalGroup(
-            BOARD_0_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_0_3Layout.setVerticalGroup(
-            BOARD_0_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_0_4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_0_4.setName("BOARD_0_4"); // NOI18N
-        BOARD_0_4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_0_4MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_0_4Layout = new javax.swing.GroupLayout(BOARD_0_4);
-        BOARD_0_4.setLayout(BOARD_0_4Layout);
-        BOARD_0_4Layout.setHorizontalGroup(
-            BOARD_0_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_0_4Layout.setVerticalGroup(
-            BOARD_0_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_1_0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_1_0.setName("BOARD_1_0"); // NOI18N
-        BOARD_1_0.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_0MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_1_0Layout = new javax.swing.GroupLayout(BOARD_1_0);
-        BOARD_1_0.setLayout(BOARD_1_0Layout);
-        BOARD_1_0Layout.setHorizontalGroup(
-            BOARD_1_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_1_0Layout.setVerticalGroup(
-            BOARD_1_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_1_1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_1_1.setName("BOARD_1_1"); // NOI18N
-        BOARD_1_1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_1MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_1_1Layout = new javax.swing.GroupLayout(BOARD_1_1);
-        BOARD_1_1.setLayout(BOARD_1_1Layout);
-        BOARD_1_1Layout.setHorizontalGroup(
-            BOARD_1_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_1_1Layout.setVerticalGroup(
-            BOARD_1_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_1_2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_1_2.setName("BOARD_1_2"); // NOI18N
-        BOARD_1_2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_2MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_1_2Layout = new javax.swing.GroupLayout(BOARD_1_2);
-        BOARD_1_2.setLayout(BOARD_1_2Layout);
-        BOARD_1_2Layout.setHorizontalGroup(
-            BOARD_1_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_1_2Layout.setVerticalGroup(
-            BOARD_1_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_1_3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_1_3.setName("BOARD_1_3"); // NOI18N
-        BOARD_1_3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_3MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_1_3Layout = new javax.swing.GroupLayout(BOARD_1_3);
-        BOARD_1_3.setLayout(BOARD_1_3Layout);
-        BOARD_1_3Layout.setHorizontalGroup(
-            BOARD_1_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_1_3Layout.setVerticalGroup(
-            BOARD_1_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_1_4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_1_4.setName("BOARD_1_4"); // NOI18N
-        BOARD_1_4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_4MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_1_4Layout = new javax.swing.GroupLayout(BOARD_1_4);
-        BOARD_1_4.setLayout(BOARD_1_4Layout);
-        BOARD_1_4Layout.setHorizontalGroup(
-            BOARD_1_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_1_4Layout.setVerticalGroup(
-            BOARD_1_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_2_0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_2_0.setName("BOARD_2_0"); // NOI18N
-        BOARD_2_0.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_2_0MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_2_0Layout = new javax.swing.GroupLayout(BOARD_2_0);
-        BOARD_2_0.setLayout(BOARD_2_0Layout);
-        BOARD_2_0Layout.setHorizontalGroup(
-            BOARD_2_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_2_0Layout.setVerticalGroup(
-            BOARD_2_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_2_1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_2_1.setName("BOARD_2_1"); // NOI18N
-        BOARD_2_1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_2_1MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_2_1Layout = new javax.swing.GroupLayout(BOARD_2_1);
-        BOARD_2_1.setLayout(BOARD_2_1Layout);
-        BOARD_2_1Layout.setHorizontalGroup(
-            BOARD_2_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_2_1Layout.setVerticalGroup(
-            BOARD_2_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_2_2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_2_2.setName("BOARD_2_2"); // NOI18N
-        BOARD_2_2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_2_2MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_2_2Layout = new javax.swing.GroupLayout(BOARD_2_2);
-        BOARD_2_2.setLayout(BOARD_2_2Layout);
-        BOARD_2_2Layout.setHorizontalGroup(
-            BOARD_2_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_2_2Layout.setVerticalGroup(
-            BOARD_2_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_2_3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_2_3.setName("BOARD_2_3"); // NOI18N
-        BOARD_2_3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_2_3MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_2_3Layout = new javax.swing.GroupLayout(BOARD_2_3);
-        BOARD_2_3.setLayout(BOARD_2_3Layout);
-        BOARD_2_3Layout.setHorizontalGroup(
-            BOARD_2_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_2_3Layout.setVerticalGroup(
-            BOARD_2_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_2_4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_2_4.setName("BOARD_2_4"); // NOI18N
-        BOARD_2_4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_2_4MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_2_4Layout = new javax.swing.GroupLayout(BOARD_2_4);
-        BOARD_2_4.setLayout(BOARD_2_4Layout);
-        BOARD_2_4Layout.setHorizontalGroup(
-            BOARD_2_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_2_4Layout.setVerticalGroup(
-            BOARD_2_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_3_0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_3_0.setName("BOARD_3_0"); // NOI18N
-        BOARD_3_0.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_3_0MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_3_0Layout = new javax.swing.GroupLayout(BOARD_3_0);
-        BOARD_3_0.setLayout(BOARD_3_0Layout);
-        BOARD_3_0Layout.setHorizontalGroup(
-            BOARD_3_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_3_0Layout.setVerticalGroup(
-            BOARD_3_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_3_1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_3_1.setName("BOARD_3_1"); // NOI18N
-        BOARD_3_1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_3_1MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_3_1Layout = new javax.swing.GroupLayout(BOARD_3_1);
-        BOARD_3_1.setLayout(BOARD_3_1Layout);
-        BOARD_3_1Layout.setHorizontalGroup(
-            BOARD_3_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_3_1Layout.setVerticalGroup(
-            BOARD_3_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_3_2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_3_2.setName("BOARD_3_2"); // NOI18N
-        BOARD_3_2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_3_2MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_3_2Layout = new javax.swing.GroupLayout(BOARD_3_2);
-        BOARD_3_2.setLayout(BOARD_3_2Layout);
-        BOARD_3_2Layout.setHorizontalGroup(
-            BOARD_3_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_3_2Layout.setVerticalGroup(
-            BOARD_3_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_3_3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_3_3.setName("BOARD_3_3"); // NOI18N
-        BOARD_3_3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_3_3MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_3_3Layout = new javax.swing.GroupLayout(BOARD_3_3);
-        BOARD_3_3.setLayout(BOARD_3_3Layout);
-        BOARD_3_3Layout.setHorizontalGroup(
-            BOARD_3_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_3_3Layout.setVerticalGroup(
-            BOARD_3_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_3_4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_3_4.setName("BOARD_3_4"); // NOI18N
-        BOARD_3_4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_3_4MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_3_4Layout = new javax.swing.GroupLayout(BOARD_3_4);
-        BOARD_3_4.setLayout(BOARD_3_4Layout);
-        BOARD_3_4Layout.setHorizontalGroup(
-            BOARD_3_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_3_4Layout.setVerticalGroup(
-            BOARD_3_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_4_0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_4_0.setName("BOARD_4_0"); // NOI18N
-        BOARD_4_0.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_4_0MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_4_0Layout = new javax.swing.GroupLayout(BOARD_4_0);
-        BOARD_4_0.setLayout(BOARD_4_0Layout);
-        BOARD_4_0Layout.setHorizontalGroup(
-            BOARD_4_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_4_0Layout.setVerticalGroup(
-            BOARD_4_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_4_1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_4_1.setName("BOARD_4_1"); // NOI18N
-        BOARD_4_1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_4_1MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_4_1Layout = new javax.swing.GroupLayout(BOARD_4_1);
-        BOARD_4_1.setLayout(BOARD_4_1Layout);
-        BOARD_4_1Layout.setHorizontalGroup(
-            BOARD_4_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_4_1Layout.setVerticalGroup(
-            BOARD_4_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_4_2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_4_2.setName("BOARD_4_2"); // NOI18N
-        BOARD_4_2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_4_2MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_4_2Layout = new javax.swing.GroupLayout(BOARD_4_2);
-        BOARD_4_2.setLayout(BOARD_4_2Layout);
-        BOARD_4_2Layout.setHorizontalGroup(
-            BOARD_4_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_4_2Layout.setVerticalGroup(
-            BOARD_4_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_4_3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_4_3.setName("BOARD_4_3"); // NOI18N
-        BOARD_4_3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_4_3MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_4_3Layout = new javax.swing.GroupLayout(BOARD_4_3);
-        BOARD_4_3.setLayout(BOARD_4_3Layout);
-        BOARD_4_3Layout.setHorizontalGroup(
-            BOARD_4_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_4_3Layout.setVerticalGroup(
-            BOARD_4_3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BOARD_4_4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        BOARD_4_4.setName("BOARD_4_4"); // NOI18N
-        BOARD_4_4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_4_4MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout BOARD_4_4Layout = new javax.swing.GroupLayout(BOARD_4_4);
-        BOARD_4_4.setLayout(BOARD_4_4Layout);
-        BOARD_4_4Layout.setHorizontalGroup(
-            BOARD_4_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-        BOARD_4_4Layout.setVerticalGroup(
-            BOARD_4_4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
-
-        BLACK_BUTTON.setText("Black");
-        BLACK_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BLACK_BUTTONMouseClicked(evt);
-            }
-        });
-        BLACK_BUTTON.addActionListener(new java.awt.event.ActionListener() {
+        X_BUTTON.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BLACK_BUTTONActionPerformed(evt);
+                X_BUTTONActionPerformed(evt);
             }
         });
 
-        WHITE_BUTTON.setText("White");
-        WHITE_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
+        O_BUTTON.setText("2 - o");
+        O_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                WHITE_BUTTONMouseClicked(evt);
+                O_BUTTONMouseClicked(evt);
             }
         });
 
         RESET_BUTTON.setText("RESET");
+        RESET_BUTTON.setEnabled(false);
         RESET_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 RESET_BUTTONMouseClicked(evt);
@@ -576,14 +178,19 @@ public class GameWindow extends javax.swing.JFrame {
         DISPLAY_WINNER_TEXT_FIELD.setEnabled(false);
 
         MAX_DEPTH_GAME_TREE_REACHED_TEXT.setText("Max Depth of Game Tree Reached");
+        MAX_DEPTH_GAME_TREE_REACHED_TEXT.setEnabled(false);
+
+        MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD.setEnabled(false);
 
         TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT.setText("Total # of Nodes Generated in Tree");
+        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT.setEnabled(false);
         TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXTActionPerformed(evt);
             }
         });
 
+        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD.setEnabled(false);
         TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELDActionPerformed(evt);
@@ -591,17 +198,206 @@ public class GameWindow extends javax.swing.JFrame {
         });
 
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT.setText("# of Times Evalution Function called in MAX-VALUE");
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT.setEnabled(false);
+
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD.setEnabled(false);
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed(evt);
+            }
+        });
 
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT.setText("# of Times Evalution Function called in MIN-VALUE");
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT.setEnabled(false);
+
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD.setEnabled(false);
 
         TIMES_PRUNING_OCCURRED_IN_MAX_TEXT.setText("# of Times Pruning Occurred in MAX-VALUE");
+        TIMES_PRUNING_OCCURRED_IN_MAX_TEXT.setEnabled(false);
         TIMES_PRUNING_OCCURRED_IN_MAX_TEXT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TIMES_PRUNING_OCCURRED_IN_MAX_TEXTActionPerformed(evt);
             }
         });
 
+        TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD.setEnabled(false);
+
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT.setText("# of Times Pruning Occurred in MIN-VALUE");
+        TIMES_PRUNING_OCCURRED_IN_MIN_TEXT.setEnabled(false);
+
+        TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD.setEnabled(false);
+
+        BOARD_0_1.setText("x");
+        BOARD_0_1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_0_1MouseClicked(evt);
+            }
+        });
+
+        BOARD_0_2.setText("x");
+        BOARD_0_2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_0_2MouseClicked(evt);
+            }
+        });
+
+        BOARD_0_3.setText("x");
+        BOARD_0_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_0_3MouseClicked(evt);
+            }
+        });
+
+        BOARD_0_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_0_4MouseClicked(evt);
+            }
+        });
+
+        BOARD_1_0.setText("o");
+        BOARD_1_0.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_0MouseClicked(evt);
+            }
+        });
+        BOARD_1_0.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BOARD_1_0ActionPerformed(evt);
+            }
+        });
+
+        BOARD_1_1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_1MouseClicked(evt);
+            }
+        });
+
+        BOARD_1_2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_2MouseClicked(evt);
+            }
+        });
+
+        BOARD_1_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_3MouseClicked(evt);
+            }
+        });
+
+        BOARD_1_4.setText("o");
+        BOARD_1_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_4MouseClicked(evt);
+            }
+        });
+        BOARD_1_4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BOARD_1_4ActionPerformed(evt);
+            }
+        });
+
+        BOARD_2_0.setText("o");
+        BOARD_2_0.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_2_0MouseClicked(evt);
+            }
+        });
+
+        BOARD_3_0.setText("o");
+        BOARD_3_0.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_3_0MouseClicked(evt);
+            }
+        });
+
+        BOARD_4_0.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_4_0MouseClicked(evt);
+            }
+        });
+
+        BOARD_2_1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_2_1MouseClicked(evt);
+            }
+        });
+
+        BOARD_2_2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_2_2MouseClicked(evt);
+            }
+        });
+
+        BOARD_2_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_2_3MouseClicked(evt);
+            }
+        });
+
+        BOARD_2_4.setText("o");
+        BOARD_2_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_2_4MouseClicked(evt);
+            }
+        });
+
+        BOARD_3_1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_3_1MouseClicked(evt);
+            }
+        });
+
+        BOARD_3_2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_3_2MouseClicked(evt);
+            }
+        });
+
+        BOARD_3_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_3_3MouseClicked(evt);
+            }
+        });
+
+        BOARD_3_4.setText("o");
+        BOARD_3_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_3_4MouseClicked(evt);
+            }
+        });
+
+        BOARD_4_1.setText("x");
+        BOARD_4_1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_4_1MouseClicked(evt);
+            }
+        });
+
+        BOARD_4_2.setText("x");
+        BOARD_4_2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_4_2MouseClicked(evt);
+            }
+        });
+
+        BOARD_4_3.setText("x");
+        BOARD_4_3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_4_3MouseClicked(evt);
+            }
+        });
+
+        BOARD_4_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_4_4MouseClicked(evt);
+            }
+        });
+
+        BOARD_0_0.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_0_0MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -609,270 +405,210 @@ public class GameWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(165, 165, 165)
-                                .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_1_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_0_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_0_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(BOARD_1_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(BOARD_0_3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(87, 87, 87))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(131, 131, 131)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_1_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_1_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_0_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_0_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_0_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(BLACK_BUTTON, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(WHITE_BUTTON, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(RESET_BUTTON))
-                .addContainerGap(90, Short.MAX_VALUE))
+                    .addComponent(RESET_BUTTON)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(O_BUTTON)
+                        .addComponent(X_BUTTON)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(BLACK_BUTTON)
+                .addGap(113, 113, 113)
+                .addComponent(X_BUTTON)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(WHITE_BUTTON)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(O_BUTTON)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(RESET_BUTTON)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(22, 22, 22)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_0_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_0_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_0_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(BOARD_0_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(BOARD_0_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(BOARD_0_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_1_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_1_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(BOARD_1_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(BOARD_1_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(133, Short.MAX_VALUE))
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(32, 32, 32))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void BOARD_0_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_0MouseClicked
+    private void X_BUTTONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_X_BUTTONActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_0_0MouseClicked
+    }//GEN-LAST:event_X_BUTTONActionPerformed
 
-    private void BOARD_0_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_1MouseClicked
+    private void O_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_O_BUTTONMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_0_1MouseClicked
+        if (userPlayer == null) {
+            userPlayer = P2;
+            compPlayer = P1;
 
-    private void BOARD_0_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_2MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_0_2MouseClicked
+            /* User has chosen so these buttons are no longer needed */
+            // Disable them
+            X_BUTTON.setEnabled(false);
+            O_BUTTON.setEnabled(false);
+            // Make them invisible
+            X_BUTTON.setVisible(false);
+            O_BUTTON.setVisible(false);
+        }
+    }//GEN-LAST:event_O_BUTTONMouseClicked
 
-    private void BOARD_0_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_3MouseClicked
+    private void X_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_X_BUTTONMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_0_3MouseClicked
+        if (userPlayer == null) {
+            userPlayer = P1;
+            compPlayer = P2;
 
-    private void BOARD_0_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_4MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_0_4MouseClicked
-
-    private void BOARD_1_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_0MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_1_0MouseClicked
-
-    private void BOARD_1_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_1_1MouseClicked
-
-    private void BOARD_1_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_2MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_1_2MouseClicked
-
-    private void BOARD_1_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_3MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_1_3MouseClicked
-
-    private void BOARD_1_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_4MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_1_4MouseClicked
-
-    private void BOARD_2_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_0MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_2_0MouseClicked
-
-    private void BOARD_2_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_2_1MouseClicked
-
-    private void BOARD_2_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_2MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_2_2MouseClicked
-
-    private void BOARD_2_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_3MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_2_3MouseClicked
-
-    private void BOARD_2_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_4MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_2_4MouseClicked
-
-    private void BOARD_3_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_0MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_3_0MouseClicked
-
-    private void BOARD_3_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_3_1MouseClicked
-
-    private void BOARD_3_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_2MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_3_2MouseClicked
-
-    private void BOARD_3_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_3MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_3_3MouseClicked
-
-    private void BOARD_3_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_4MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_3_4MouseClicked
-
-    private void BOARD_4_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_0MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_4_0MouseClicked
-
-    private void BOARD_4_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_4_1MouseClicked
-
-    private void BOARD_4_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_2MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_4_2MouseClicked
-
-    private void BOARD_4_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_3MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_4_3MouseClicked
-
-    private void BOARD_4_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_4MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BOARD_4_4MouseClicked
-
-    private void BLACK_BUTTONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BLACK_BUTTONActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BLACK_BUTTONActionPerformed
-
-    private void WHITE_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_WHITE_BUTTONMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_WHITE_BUTTONMouseClicked
-
-    private void BLACK_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BLACK_BUTTONMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BLACK_BUTTONMouseClicked
+            /* User has chosen so these buttons are no longer needed */
+            // Disable them
+            X_BUTTON.setEnabled(false);
+            O_BUTTON.setEnabled(false);
+            // Make them invisible
+            X_BUTTON.setVisible(false);
+            O_BUTTON.setVisible(false);
+        }
+    }//GEN-LAST:event_X_BUTTONMouseClicked
 
     private void RESET_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RESET_BUTTONMouseClicked
         // TODO add your handling code here:
@@ -890,6 +626,527 @@ public class GameWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_TIMES_PRUNING_OCCURRED_IN_MAX_TEXTActionPerformed
 
+    private void TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed
+
+    private void BOARD_0_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_1MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 0;
+        int posY = 1;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_0_1;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_0_1MouseClicked
+
+    private void BOARD_0_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_2MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 0;
+        int posY = 2;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_0_2;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_0_2MouseClicked
+
+    private void BOARD_0_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_3MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 0;
+        int posY = 3;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_0_3;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_0_3MouseClicked
+
+    private void BOARD_0_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_4MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 0;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_0_4;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_0_4MouseClicked
+
+    private void BOARD_1_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_0MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_0;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_0MouseClicked
+
+    private void BOARD_1_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_1MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 1;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_1;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_1MouseClicked
+
+    private void BOARD_1_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_2MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 2;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_2;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_2MouseClicked
+
+    private void BOARD_1_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_3MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 3;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_3;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_3MouseClicked
+
+    private void BOARD_1_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_4MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_4;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_4MouseClicked
+
+    private void BOARD_2_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_0MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 2;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_2_0;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_2_0MouseClicked
+
+    private void BOARD_2_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_1MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 2;
+        int posY = 1;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_2_1;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_2_1MouseClicked
+
+    private void BOARD_2_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_2MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 2;
+        int posY = 2;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_2_2;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_2_2MouseClicked
+
+    private void BOARD_2_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_3MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 2;
+        int posY = 3;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_2_3;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_2_3MouseClicked
+
+    private void BOARD_2_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_4MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 2;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_2_4;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_2_4MouseClicked
+
+    private void BOARD_3_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_0MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 3;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_3_0;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_3_0MouseClicked
+
+    private void BOARD_3_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_1MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 3;
+        int posY = 1;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_3_1;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_3_1MouseClicked
+
+    private void BOARD_3_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_2MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 3;
+        int posY = 2;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_3_2;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_3_2MouseClicked
+
+    private void BOARD_3_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_3MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 3;
+        int posY = 3;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_3_3;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_3_3MouseClicked
+
+    private void BOARD_3_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_3_4MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 3;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_3_4;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_3_4MouseClicked
+
+    private void BOARD_4_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_0MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 4;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_4_0;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_4_0MouseClicked
+
+    private void BOARD_4_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_1MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 4;
+        int posY = 1;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_4_1;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_4_1MouseClicked
+
+    private void BOARD_4_2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_2MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 4;
+        int posY = 2;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_4_2;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_4_2MouseClicked
+
+    private void BOARD_4_3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_3MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 4;
+        int posY = 3;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_4_3;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_4_3MouseClicked
+
+    private void BOARD_4_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_4_4MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 4;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_4_4;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_4_4MouseClicked
+
+    private void BOARD_1_0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOARD_1_0ActionPerformed
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_0;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_0ActionPerformed
+
+    private void BOARD_1_4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOARD_1_4ActionPerformed
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_1_4;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_4ActionPerformed
+
+    private void BOARD_0_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_0MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 0;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+        jt = BOARD_0_0;
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_0_0MouseClicked
+
+    
+    /* Takes the x, y position clicked on the board and the reference to the board's JToggleButton.
+    Checks to see there was already a Piece selected:
+        If no: selects the Piece if the Piece is owned by the currentPlayer who's turn it is
+        If yes:
+            1) unselects the Piece if the same Piece is selected again
+            2) takes over a Piece if the new position contains a Piece owned
+               by the opposing player (and checks if such move is valid)
+            3) moves the selectedPiece to the new position which does not
+               contain any Piece (and checks if such move is valid)
+    */
+    private void performClick(int x, int y, javax.swing.JToggleButton jt) {
+        // Check if a Piece has been selected already
+        if (selectedPiece == null) {
+            // Check if there is a Piece to select at this board position
+            if (board[x][y] != null) {
+                // Check if the Piece is owned by the currentPlayer
+                if (board[x][y].getPlayer() == currentPlayer) {
+                    // Set selectedPiece to the Piece at this board position
+                    selectedPiece = board[x][y];
+                }
+            }
+            // There is no Piece, so do not select this position
+            else {
+                jt.setSelected(false);
+            }
+        }
+        
+        // A Piece has already been selected
+        else {
+            // Same Piece selected again so unselect it
+            if (selectedPiece == board[x][y]) {
+                selectedPiece = null;
+                jt.setSelected(false);
+            }
+            // New position contains a Piece already
+            else if (board[x][y] != null) {
+                ;
+            }
+            // New position does not contain any Piece
+            else {
+                ;
+            }
+        }        
+    }
+    
+    public boolean isValidMove() {
+        return true;
+    }
+    
+    public int getPiecesInRow(Piece p) {
+        int x = p.getX();
+        
+        int pieces = 0;
+        
+        for (int i = 0; i < boardSize; ++i) {
+            if (board[x][i] != null) {
+                ++pieces;
+            }
+        }
+        
+        return pieces;
+    }
+    
+    public int getPiecesInColumn(Piece p) {
+        int y = p.getY();
+        
+        int pieces = 0;
+        
+        for (int i = 0; i < boardSize; ++i) {
+            if (board[i][y] != null) {
+                ++pieces;
+            }
+        }
+        
+        return pieces;
+    }
+    
+    public int getPiecesInLeftToRightDiagonal(Piece p) {
+        int x = p.getX();
+        int y = p.getY();
+        
+        int startRow, startColumn;
+        
+        int pieces = 0;
+        
+        // used to get starting diagonal position
+        if (x < y) {
+            startRow = 0;
+            startColumn = y - x;
+        }
+        else {
+            startRow = x - y;
+            startColumn = 0;
+        }
+        
+        // loop over the diagonal (making sure not to go past the board's border)
+        for (int i = startRow; i < (boardSize - startColumn); ++i) {
+            for (int j = startColumn; j < (boardSize - startRow); ++i) {
+                if (board[i][j] != null) {
+                    ++pieces;
+                }
+            }
+        }
+        
+        return pieces;
+    }
+    
+    public int getPiecesInRightToLeftDiagonal(Piece p) {
+        int x = p.getX();
+        int y = p.getY();
+        
+        int startRow, startColumn;
+        
+        int pieces = 0;
+        
+        // used to get starting diagonal position
+        if (x < y) {
+            if ((x + y) < boardSize) {
+                startRow = 0;
+                startColumn = x + y;
+            }
+            else {
+                startRow = (x + y) - boardSize + 1;
+                startColumn = boardSize - 1;
+            }
+        }
+        else {
+            startRow = x + y;
+            if (startRow > (boardSize - 1)) {
+                startRow = boardSize - 1;
+            }
+            startColumn = 0;
+        }
+        
+        // loop over the diagonal (making sure not to go past the board's border)
+        for (int i = startRow; i < (boardSize - startColumn); ++i) {
+            for (int j = startColumn; j < (boardSize - startRow); ++i) {
+                if (board[i][j] != null) {
+                    ++pieces;
+                }
+            }
+        }
+        
+        return pieces;
+    }  
+        
+    /* Takes the x, y position clicked on the board and the reference to the board's JToggleButton.
+    Checks to see there was already a Piece selected:
+        If no: selects the Piece if the Piece is owned by the currentPlayer who's turn it is
+        If yes:
+            1) unselects the Piece if the same Piece is selected again
+            2) takes over a Piece if the new position contains a Piece owned
+               by the opposing player (and checks if such move is valid)
+            3) moves the selectedPiece to the new position which does not
+               contain any Piece (and checks if such move is valid)
+    */
+//        // Check if a Piece has been selected already
+//        if (selectedPiece == null) {
+//            // Check if there is a Piece to select at this board position
+//            if (board[x][y] != null) {
+//                // Check if the Piece is owned by the currentPlayer
+//                if (board[x][y].getPlayer() == currentPlayer) {
+//                    // Set selectedPiece to the Piece at this board position
+//                    selectedPiece = board[x][y];
+//                }
+//            }
+//            // There is no Piece, so do not select this position
+//            else {
+//                jt.setSelected(false);
+//            }
+//        }
+//        
+//        // A Piece has already been selected
+//        else {
+//            // Same Piece selected again so unselect it
+//            if (selectedPiece == board[x][y]) {
+//                selectedPiece = null;
+//                jt.setSelected(false);
+//            }
+//            // New position contains a Piece already
+//            else if (board[x][y] != null) {
+//                ;
+//            }
+//            // New position does not contain any Piece
+//            else {
+//                ;
+//            }
+//        }      
+    
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -923,38 +1180,41 @@ public class GameWindow extends javax.swing.JFrame {
                 new GameWindow().setVisible(true);
             }
         });
+        
     }
+    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BLACK_BUTTON;
-    private javax.swing.JPanel BOARD_0_0;
-    private javax.swing.JPanel BOARD_0_1;
-    private javax.swing.JPanel BOARD_0_2;
-    private javax.swing.JPanel BOARD_0_3;
-    private javax.swing.JPanel BOARD_0_4;
-    private javax.swing.JPanel BOARD_1_0;
-    private javax.swing.JPanel BOARD_1_1;
-    private javax.swing.JPanel BOARD_1_2;
-    private javax.swing.JPanel BOARD_1_3;
-    private javax.swing.JPanel BOARD_1_4;
-    private javax.swing.JPanel BOARD_2_0;
-    private javax.swing.JPanel BOARD_2_1;
-    private javax.swing.JPanel BOARD_2_2;
-    private javax.swing.JPanel BOARD_2_3;
-    private javax.swing.JPanel BOARD_2_4;
-    private javax.swing.JPanel BOARD_3_0;
-    private javax.swing.JPanel BOARD_3_1;
-    private javax.swing.JPanel BOARD_3_2;
-    private javax.swing.JPanel BOARD_3_3;
-    private javax.swing.JPanel BOARD_3_4;
-    private javax.swing.JPanel BOARD_4_0;
-    private javax.swing.JPanel BOARD_4_1;
-    private javax.swing.JPanel BOARD_4_2;
-    private javax.swing.JPanel BOARD_4_3;
-    private javax.swing.JPanel BOARD_4_4;
+    private javax.swing.JToggleButton BOARD_0_0;
+    private javax.swing.JToggleButton BOARD_0_1;
+    private javax.swing.JToggleButton BOARD_0_2;
+    private javax.swing.JToggleButton BOARD_0_3;
+    private javax.swing.JToggleButton BOARD_0_4;
+    private javax.swing.JToggleButton BOARD_1_0;
+    private javax.swing.JToggleButton BOARD_1_1;
+    private javax.swing.JToggleButton BOARD_1_2;
+    private javax.swing.JToggleButton BOARD_1_3;
+    private javax.swing.JToggleButton BOARD_1_4;
+    private javax.swing.JToggleButton BOARD_2_0;
+    private javax.swing.JToggleButton BOARD_2_1;
+    private javax.swing.JToggleButton BOARD_2_2;
+    private javax.swing.JToggleButton BOARD_2_3;
+    private javax.swing.JToggleButton BOARD_2_4;
+    private javax.swing.JToggleButton BOARD_3_0;
+    private javax.swing.JToggleButton BOARD_3_1;
+    private javax.swing.JToggleButton BOARD_3_2;
+    private javax.swing.JToggleButton BOARD_3_3;
+    private javax.swing.JToggleButton BOARD_3_4;
+    private javax.swing.JToggleButton BOARD_4_0;
+    private javax.swing.JToggleButton BOARD_4_1;
+    private javax.swing.JToggleButton BOARD_4_2;
+    private javax.swing.JToggleButton BOARD_4_3;
+    private javax.swing.JToggleButton BOARD_4_4;
     private javax.swing.JTextField DISPLAY_WINNER_TEXT_FIELD;
     private javax.swing.JTextField MAX_DEPTH_GAME_TREE_REACHED_TEXT;
     private javax.swing.JTextField MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD;
+    private javax.swing.JButton O_BUTTON;
     private javax.swing.JButton RESET_BUTTON;
     private javax.swing.JTextField TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT;
     private javax.swing.JTextField TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD;
@@ -966,6 +1226,6 @@ public class GameWindow extends javax.swing.JFrame {
     private javax.swing.JTextField TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD;
     private javax.swing.JTextField TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT;
     private javax.swing.JTextField TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD;
-    private javax.swing.JButton WHITE_BUTTON;
+    private javax.swing.JButton X_BUTTON;
     // End of variables declaration//GEN-END:variables
 }

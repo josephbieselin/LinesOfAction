@@ -16,6 +16,8 @@ public class LinesOfAction_Java {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+//        GameWindow gw = new GameWindow();
+        GameWindow.main(null);
     }
     
 }
