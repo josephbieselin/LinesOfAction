@@ -159,10 +159,27 @@ public class GameWindow extends javax.swing.JFrame {
         buttons[4][3] = BOARD_4_3;
         buttons[4][4] = BOARD_4_4;
         
+        // initialized board does not have Players yet so disable buttons
+        disableButtons();
     }
     
+    // Disable all JToggleButtons on the board
+    private void disableButtons() {
+        for (int i = 0; i < boardSize; ++i) {
+            for (int j = 0; j < boardSize; ++j) {
+                buttons[i][j].setEnabled(false);
+            }
+        }
+    }
     
-    
+    // Enable all JToggleButtons on the board
+    private void enableButtons() {
+        for (int i = 0; i < boardSize; ++i) {
+            for (int j = 0; j < boardSize; ++j) {
+                buttons[i][j].setEnabled(true);
+            }
+        }
+    }    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -629,6 +646,9 @@ public class GameWindow extends javax.swing.JFrame {
             userPlayer = P2;
             compPlayer = P1;
 
+            // enable JToggleButtons to play game
+            enableButtons();
+            
             /* User has chosen so these buttons are no longer needed */
             // Disable them
             X_BUTTON.setEnabled(false);
@@ -644,7 +664,10 @@ public class GameWindow extends javax.swing.JFrame {
         if (userPlayer == null) {
             userPlayer = P1;
             compPlayer = P2;
-
+            
+            // enable JToggleButtons to play game
+            enableButtons();
+            
             /* User has chosen so these buttons are no longer needed */
             // Disable them
             X_BUTTON.setEnabled(false);
@@ -1012,6 +1035,11 @@ public class GameWindow extends javax.swing.JFrame {
                contain any Piece (and checks if such move is valid)
     */
     private void performClick(int x, int y, javax.swing.JToggleButton jt) {
+        // Do nothing if neither user nor computer Players have been set
+        if (userPlayer == null || compPlayer == null) {
+            return;
+        }
+        
         // Check if a Piece has been selected already
         if (selectedPiece == null) {
             // Check if there is a Piece for currentPlayer to select at this board position
@@ -1169,12 +1197,8 @@ public class GameWindow extends javax.swing.JFrame {
         Piece tempPiece;
 
         if (pY > y) {
-            // return false if the move would go off the board
-            if ((pY - moveSpaces) < 0) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if ((pY - moveSpaces) != y) {
+            // return false if the move does not match the new position
+            if ((pY - moveSpaces) != y) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1199,12 +1223,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         }
         else {
-            // return false if the move would go off the board
-            if ((pY + moveSpaces) >= boardSize) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if ((pY + moveSpaces) != y) {
+            // return false if the move does not match the new position
+            if ((pY + moveSpaces) != y) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1237,12 +1257,8 @@ public class GameWindow extends javax.swing.JFrame {
         Piece tempPiece;
 
         if (pX > x) {
-            // return false if the move would go off the board
-            if ((pX - moveSpaces) < 0) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if ((pX - moveSpaces) != x) {
+            // return false if the move does not match the new position
+            if ((pX - moveSpaces) != x) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1267,12 +1283,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         }
         else {
-            // return false if the move would go off the board
-            if ((pX + moveSpaces) >= boardSize) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if ((pX + moveSpaces) != x) {
+            // return false if the move does not match the new position
+            if ((pX + moveSpaces) != x) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1305,12 +1317,8 @@ public class GameWindow extends javax.swing.JFrame {
         Piece tempPiece;
 
         if (pX > x) {
-            // return false if the move would go off the board
-            if (((pX - moveSpaces) < 0) || ((pY - moveSpaces) < 0)) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if (((pX - moveSpaces) != x) || ((pY - moveSpaces) != y)) {
+            // return false if the move does not match the new position
+            if (((pX - moveSpaces) != x) || ((pY - moveSpaces) != y)) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1335,12 +1343,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         }
         else {
-            // return false if the move would go off the board
-            if (((pX + moveSpaces) >= boardSize) || ((pY + moveSpaces) >= boardSize)) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if (((pX + moveSpaces) != x) || ((pY + moveSpaces) != y)) {
+            // return false if the move does not match the new position
+            if (((pX + moveSpaces) != x) || ((pY + moveSpaces) != y)) {
                 return false;
             }
                         // move does not go off board, so check if valid
@@ -1373,12 +1377,8 @@ public class GameWindow extends javax.swing.JFrame {
         Piece tempPiece;
 
         if (pX > x) {
-            // return false if the move would go off the board
-            if (((pX - moveSpaces) < 0) || ((pY + moveSpaces) >= boardSize)) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if (((pX - moveSpaces) != x) || ((pY + moveSpaces) != y)) {
+            // return false if the move does not match the new position
+            if (((pX - moveSpaces) != x) || ((pY + moveSpaces) != y)) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1403,12 +1403,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         }
         else {
-            // return false if the move would go off the board
-            if (((pX + moveSpaces) >= boardSize) || ((pY - moveSpaces) < 0)) {
-                return false;
-            }
-            // return false if the move would not reach the new position
-            else if (((pX + moveSpaces) != x) || ((pY - moveSpaces) != y)) {
+            // return false if the move does not match the new position
+            if (((pX + moveSpaces) != x) || ((pY - moveSpaces) != y)) {
                 return false;
             }
             // move does not go off board, so check if valid
