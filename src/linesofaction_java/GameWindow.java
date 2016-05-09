@@ -1124,7 +1124,7 @@ public class GameWindow extends javax.swing.JFrame {
             path = COLUMN;
         }
         // selectedPiece and new position are in the same diagonal
-        else if (Math.abs(pX - pY) == Math.abs(x - y)) {
+        else if (onDiagonal(pX, pY, x, y)) {
             // left-to-right diagonal
             if (onLeftToRightDiagonal(pX, pY, x, y)) {
                 moveSpaces = getPiecesInLeftToRightDiagonal(selectedPiece);
@@ -1173,6 +1173,10 @@ public class GameWindow extends javax.swing.JFrame {
             if ((pY - moveSpaces) < 0) {
                 return false;
             }
+            // return false if the move would not reach the new position
+            else if ((pY - moveSpaces) != y) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1197,6 +1201,10 @@ public class GameWindow extends javax.swing.JFrame {
         else {
             // return false if the move would go off the board
             if ((pY + moveSpaces) >= boardSize) {
+                return false;
+            }
+            // return false if the move would not reach the new position
+            else if ((pY + moveSpaces) != y) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1233,6 +1241,10 @@ public class GameWindow extends javax.swing.JFrame {
             if ((pX - moveSpaces) < 0) {
                 return false;
             }
+            // return false if the move would not reach the new position
+            else if ((pX - moveSpaces) != x) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1257,6 +1269,10 @@ public class GameWindow extends javax.swing.JFrame {
         else {
             // return false if the move would go off the board
             if ((pX + moveSpaces) >= boardSize) {
+                return false;
+            }
+            // return false if the move would not reach the new position
+            else if ((pX + moveSpaces) != x) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1293,6 +1309,10 @@ public class GameWindow extends javax.swing.JFrame {
             if (((pX - moveSpaces) < 0) || ((pY - moveSpaces) < 0)) {
                 return false;
             }
+            // return false if the move would not reach the new position
+            else if (((pX - moveSpaces) != x) || ((pY - moveSpaces) != y)) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1319,7 +1339,11 @@ public class GameWindow extends javax.swing.JFrame {
             if (((pX + moveSpaces) >= boardSize) || ((pY + moveSpaces) >= boardSize)) {
                 return false;
             }
-            // move does not go off board, so check if valid
+            // return false if the move would not reach the new position
+            else if (((pX + moveSpaces) != x) || ((pY + moveSpaces) != y)) {
+                return false;
+            }
+                        // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
                     // check next position in the down-and-right diagonal
@@ -1353,6 +1377,10 @@ public class GameWindow extends javax.swing.JFrame {
             if (((pX - moveSpaces) < 0) || ((pY + moveSpaces) >= boardSize)) {
                 return false;
             }
+            // return false if the move would not reach the new position
+            else if (((pX - moveSpaces) != x) || ((pY + moveSpaces) != y)) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1377,6 +1405,10 @@ public class GameWindow extends javax.swing.JFrame {
         else {
             // return false if the move would go off the board
             if (((pX + moveSpaces) >= boardSize) || ((pY - moveSpaces) < 0)) {
+                return false;
+            }
+            // return false if the move would not reach the new position
+            else if (((pX + moveSpaces) != x) || ((pY - moveSpaces) != y)) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1436,31 +1468,45 @@ public class GameWindow extends javax.swing.JFrame {
         int x = p.getX();
         int y = p.getY();
         
-        int startRow, startColumn;
+        // we know our current piece is in this diagonal
+        int pieces = 1;
         
-        int pieces = 0;
+//        int startRow, startColumn;
+//        
+//        // used to get starting diagonal position
+//        if (x < y) {
+//            startRow = 0;
+//            startColumn = y - x;
+//        }
+//        else {
+//            startRow = x - y;
+//            startColumn = 0;
+//        }
+//        
+//        // loop over the diagonal (making sure not to go past the board's border)
+//        for (int i = startRow; i < boardSize; ++i) {
+//            if (startColumn >= boardSize) {
+//                break;
+//            }
+//            
+//            if (board[i][startColumn] != null) {
+//                ++pieces;
+//            }
+//            
+//            ++startColumn;
+//        }
         
-        // used to get starting diagonal position
-        if (x < y) {
-            startRow = 0;
-            startColumn = y - x;
-        }
-        else {
-            startRow = x - y;
-            startColumn = 0;
-        }
-        
-        // loop over the diagonal (making sure not to go past the board's border)
-        for (int i = startRow; i < boardSize; ++i) {
-            if (startColumn >= boardSize) {
-                break;
-            }
-            
-            if (board[i][startColumn] != null) {
+        // check for Pieces up-and-left
+        for (int i = x-1, j = y-1; i >= 0 && j >= 0; --i, --j) {
+            if (board[i][j] != null) {
                 ++pieces;
             }
-            
-            ++startColumn;
+        }
+        // check for Pieces down-and-right
+        for (int i = x+1, j = y+1; i < boardSize && j < boardSize; ++i, ++j) {
+            if (board[i][j] != null) {
+                ++pieces;
+            }
         }
         
         return pieces;
@@ -1470,35 +1516,72 @@ public class GameWindow extends javax.swing.JFrame {
         int x = p.getX();
         int y = p.getY();
         
-        int startRow, startColumn;
-        
-        int pieces = 0;
-        
-        if ((x + y) < boardSize) {
-            startRow = 0;
-            startColumn = x + y;
-        }
-        else {
-            startRow = (x + y) - boardSize + 1;
-            startColumn = boardSize - 1;
-        }
-        
-        // loop over the diagonal (making sure not to go past the board's border)
-        for (int i = startRow; i < boardSize; ++i) {
-            if (startColumn < 0) {
-                break;
-            }
-            
-            if (board[i][startColumn] != null) {
+        // we know our current piece is in this diagonal
+        int pieces = 1;
+
+//        int startRow, startColumn;
+//        
+//        if ((x + y) < boardSize) {
+//            startRow = 0;
+//            startColumn = x + y;
+//        }
+//        else {
+//            startRow = (x + y) - boardSize + 1;
+//            startColumn = boardSize - 1;
+//        }
+//        
+//        // loop over the diagonal (making sure not to go past the board's border)
+//        for (int i = startRow; i < boardSize; ++i) {
+//            if (startColumn < 0) {
+//                break;
+//            }
+//            
+//            if (board[i][startColumn] != null) {
+//                ++pieces;
+//            }
+//            
+//            --startColumn;
+//        }
+
+        // check for Pieces up-and-right
+        for (int i = x-1, j = y+1; i >= 0 && j < boardSize; --i, ++j) {
+            if (board[i][j] != null) {
                 ++pieces;
             }
-            
-            --startColumn;
+        }
+        // check for Pieces down-and-left
+        for (int i = x+1, j = y-1; i < boardSize && j >= 0; ++i, --j) {
+            if (board[i][j] != null) {
+                ++pieces;
+            }
         }
         
         return pieces;
     }  
         
+    // returns true if the positions are diagonal to each other. otherwise false.
+    private boolean onDiagonal(int pX, int pY, int x, int y) {
+        for (int i = 0; i < boardSize; ++i) {
+            // check up-and-left diagonal
+            if ((pX - i == x) && (pY - i == y)) {
+                return true;
+            }
+            // check down-and-right diagonal
+            else if ((pX + i == x) && (pY + i == y)) {
+                return true;
+            }
+            // check up-and-right diagonal
+            else if ((pX - i == x) && (pY + i == y)) {
+                return true;
+            }
+            // check down-and-left diagonal
+            else if((pX + i == x) && (pY - i) == y){
+                return true;
+            }
+        }
+        
+        return false;
+    }
     
     /* returns true if the selectedPiece's x,y are on a diagonal from
        the TopLeft-to-BottomRight with the x,y of the new position.
