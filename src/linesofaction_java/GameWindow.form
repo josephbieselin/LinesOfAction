@@ -46,7 +46,7 @@
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
+                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="BOARD_1_0" min="-2" pref="55" max="-2" attributes="0"/>
@@ -71,49 +71,44 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="BOARD_0_4" min="-2" pref="55" max="-2" attributes="0"/>
-                          <Component id="BOARD_1_4" min="-2" pref="55" max="-2" attributes="0"/>
+                          <Component id="BOARD_1_4" alignment="0" min="-2" pref="55" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="87" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="BOARD_2_0" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_2_1" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_2_2" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_2_3" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_2_4" min="-2" pref="55" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <Component id="BOARD_3_0" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_3_1" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_3_2" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_3_3" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_3_4" min="-2" pref="55" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <Component id="BOARD_4_0" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_4_1" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_4_2" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_4_3" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="BOARD_4_4" min="-2" pref="55" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="BOARD_2_0" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_2_1" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_2_2" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_2_3" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_2_4" min="-2" pref="55" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="BOARD_3_0" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_3_1" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_3_2" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_3_3" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_3_4" min="-2" pref="55" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="BOARD_4_0" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_4_1" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_4_2" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_4_3" min="-2" pref="55" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="BOARD_4_4" min="-2" pref="55" max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace min="87" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="131" max="-2" attributes="0"/>
@@ -341,25 +336,16 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_0_1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="x"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_0_1MouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_0_2">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="x"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_0_2MouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_0_3">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="x"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_0_3MouseClicked"/>
       </Events>
@@ -367,15 +353,6 @@
     <Component class="javax.swing.JToggleButton" name="BOARD_0_4">
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_0_4MouseClicked"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JToggleButton" name="BOARD_1_0">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="o"/>
-      </Properties>
-      <Events>
-        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_1_0MouseClicked"/>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BOARD_1_0ActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_1_1">
@@ -393,27 +370,12 @@
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_1_3MouseClicked"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JToggleButton" name="BOARD_1_4">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="o"/>
-      </Properties>
-      <Events>
-        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_1_4MouseClicked"/>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BOARD_1_4ActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_2_0">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="o"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_2_0MouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_3_0">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="o"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_3_0MouseClicked"/>
       </Events>
@@ -439,9 +401,6 @@
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_2_4">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="o"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_2_4MouseClicked"/>
       </Events>
@@ -462,33 +421,21 @@
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_3_4">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="o"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_3_4MouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_4_1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="x"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_4_1MouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_4_2">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="x"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_4_2MouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="BOARD_4_3">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="x"/>
-      </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_4_3MouseClicked"/>
       </Events>
@@ -501,6 +448,16 @@
     <Component class="javax.swing.JToggleButton" name="BOARD_0_0">
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_0_0MouseClicked"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JToggleButton" name="BOARD_1_0">
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_1_0MouseClicked"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JToggleButton" name="BOARD_1_4">
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_1_4MouseClicked"/>
       </Events>
     </Component>
   </SubComponents>

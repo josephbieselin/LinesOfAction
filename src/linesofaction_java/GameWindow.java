@@ -23,10 +23,17 @@ public class GameWindow extends javax.swing.JFrame {
     private Player userPlayer;
     // compPlayer is the opposite of userPlayer
     private Player compPlayer;
+    // winner is the Player who gets all their Pieces connected
+    private Player winner;
     
-    // The Game Board is a square matrix of boardSize-by-boardSize
+    // Is the game over?
+    private boolean gameOver;
+    
+    // The Game Board is a square matrix of boardSize-by-boardSize made up of Piece objects
     final public int boardSize = 5;
     private final Piece board[][];
+    // The Game Board gets user input through JToggleButton objects
+    private final javax.swing.JToggleButton buttons[][];
     
     // What is the current piece chosen to potentially move?
     private Piece selectedPiece;
@@ -34,6 +41,12 @@ public class GameWindow extends javax.swing.JFrame {
     // What is the position the Player wants to move selectedPiece to
     private int newX = -1; // -1 indicates no new position yet
     private int newY = -1; // -1 indicates no new position yet
+            
+    // Codes to determine how a move needs to be checked
+    private final int ROW = 1;
+    private final int COLUMN = 2;
+    private final int LR_DIAG = 3;
+    private final int RL_DIAG = 4;    
     // END OF OBJECT VARIABLES
     
     /**
@@ -49,24 +62,34 @@ public class GameWindow extends javax.swing.JFrame {
         
         // User has not selected which Player to be yet
         userPlayer = null;
-        compPlayer = null;        
+        compPlayer = null;   
+        
+        // Game is not over initially
+        gameOver = false;
         
         // Initialize the 2D board with null
         board = new Piece[boardSize][boardSize];
+        buttons = new javax.swing.JToggleButton[boardSize][boardSize];
         
         for (int i = 0; i < boardSize; ++i)
             for (int j = 0; j < boardSize; ++j)
                 board[i][j] = null;
         
+
+        // Store JToggleButtons into the buttons array
+        setButtons();
+        
         // Initialize game Pieces to the board and respective Players
         setPieces();
+        
+
         
         // No Piece on the board has been selected yet
         selectedPiece = null;
     }
 
     // Set Pieces on the board and to the Players according to Lines of Actions rules
-    public void setPieces() {
+    private void setPieces() {
         Piece tempPiece;
         
         for (int i = 1; i < (boardSize - 1); ++i) {
@@ -75,23 +98,70 @@ public class GameWindow extends javax.swing.JFrame {
             tempPiece = new Piece(0, i, P1);
             board[0][i] = tempPiece;
             P1.addPiece(tempPiece);
+            buttons[0][i].setText(tempPiece.getPlayer().getPlayerLetter());
             // Bottom Row
             tempPiece = new Piece(boardSize - 1, i, P1);
             board[boardSize - 1][i] = tempPiece;
             P1.addPiece(tempPiece);
+            buttons[boardSize - 1][i].setText(tempPiece.getPlayer().getPlayerLetter());
             
             /* Player 2 - White Player (o on the board) */
             // Left Column
             tempPiece = new Piece(i, 0, P2);
             board[i][0] = tempPiece;
             P2.addPiece(tempPiece);
+            buttons[i][0].setText(tempPiece.getPlayer().getPlayerLetter());
             // Right Column
             tempPiece = new Piece(i, boardSize - 1, P2);
             board[i][boardSize - 1] = tempPiece;
+            buttons[i][boardSize - 1].setText(tempPiece.getPlayer().getPlayerLetter());
             P2.addPiece(tempPiece);
         }
         
     }
+    
+    
+    
+    
+    
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    //                                                                //
+    /*   ADD ONTO THIS FUNCTION WHENEVER  THE BOARD SIZE IS CHANGED   */
+    //                                                                //
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    // Set JToggleButtons on the board
+    private void setButtons() {
+        buttons[0][0] = BOARD_0_0;
+        buttons[0][1] = BOARD_0_1;
+        buttons[0][2] = BOARD_0_2;
+        buttons[0][3] = BOARD_0_3;
+        buttons[0][4] = BOARD_0_4;
+        buttons[1][0] = BOARD_1_0;
+        buttons[1][1] = BOARD_1_1;
+        buttons[1][2] = BOARD_1_2;
+        buttons[1][3] = BOARD_1_3;
+        buttons[1][4] = BOARD_1_4;
+        buttons[2][0] = BOARD_2_0;
+        buttons[2][1] = BOARD_2_1;
+        buttons[2][2] = BOARD_2_2;
+        buttons[2][3] = BOARD_2_3;
+        buttons[2][4] = BOARD_2_4;
+        buttons[3][0] = BOARD_3_0;
+        buttons[3][1] = BOARD_3_1;
+        buttons[3][2] = BOARD_3_2;
+        buttons[3][3] = BOARD_3_3;
+        buttons[3][4] = BOARD_3_4;
+        buttons[4][0] = BOARD_4_0;
+        buttons[4][1] = BOARD_4_1;
+        buttons[4][2] = BOARD_4_2;
+        buttons[4][3] = BOARD_4_3;
+        buttons[4][4] = BOARD_4_4;
+        
+    }
+    
+    
     
     
     /**
@@ -123,11 +193,9 @@ public class GameWindow extends javax.swing.JFrame {
         BOARD_0_2 = new javax.swing.JToggleButton();
         BOARD_0_3 = new javax.swing.JToggleButton();
         BOARD_0_4 = new javax.swing.JToggleButton();
-        BOARD_1_0 = new javax.swing.JToggleButton();
         BOARD_1_1 = new javax.swing.JToggleButton();
         BOARD_1_2 = new javax.swing.JToggleButton();
         BOARD_1_3 = new javax.swing.JToggleButton();
-        BOARD_1_4 = new javax.swing.JToggleButton();
         BOARD_2_0 = new javax.swing.JToggleButton();
         BOARD_3_0 = new javax.swing.JToggleButton();
         BOARD_4_0 = new javax.swing.JToggleButton();
@@ -144,6 +212,8 @@ public class GameWindow extends javax.swing.JFrame {
         BOARD_4_3 = new javax.swing.JToggleButton();
         BOARD_4_4 = new javax.swing.JToggleButton();
         BOARD_0_0 = new javax.swing.JToggleButton();
+        BOARD_1_0 = new javax.swing.JToggleButton();
+        BOARD_1_4 = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -227,21 +297,18 @@ public class GameWindow extends javax.swing.JFrame {
 
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD.setEnabled(false);
 
-        BOARD_0_1.setText("x");
         BOARD_0_1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_0_1MouseClicked(evt);
             }
         });
 
-        BOARD_0_2.setText("x");
         BOARD_0_2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_0_2MouseClicked(evt);
             }
         });
 
-        BOARD_0_3.setText("x");
         BOARD_0_3.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_0_3MouseClicked(evt);
@@ -251,18 +318,6 @@ public class GameWindow extends javax.swing.JFrame {
         BOARD_0_4.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_0_4MouseClicked(evt);
-            }
-        });
-
-        BOARD_1_0.setText("o");
-        BOARD_1_0.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_0MouseClicked(evt);
-            }
-        });
-        BOARD_1_0.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BOARD_1_0ActionPerformed(evt);
             }
         });
 
@@ -284,26 +339,12 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
-        BOARD_1_4.setText("o");
-        BOARD_1_4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BOARD_1_4MouseClicked(evt);
-            }
-        });
-        BOARD_1_4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BOARD_1_4ActionPerformed(evt);
-            }
-        });
-
-        BOARD_2_0.setText("o");
         BOARD_2_0.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_2_0MouseClicked(evt);
             }
         });
 
-        BOARD_3_0.setText("o");
         BOARD_3_0.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_3_0MouseClicked(evt);
@@ -334,7 +375,6 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
-        BOARD_2_4.setText("o");
         BOARD_2_4.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_2_4MouseClicked(evt);
@@ -359,28 +399,24 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
-        BOARD_3_4.setText("o");
         BOARD_3_4.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_3_4MouseClicked(evt);
             }
         });
 
-        BOARD_4_1.setText("x");
         BOARD_4_1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_4_1MouseClicked(evt);
             }
         });
 
-        BOARD_4_2.setText("x");
         BOARD_4_2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_4_2MouseClicked(evt);
             }
         });
 
-        BOARD_4_3.setText("x");
         BOARD_4_3.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_4_3MouseClicked(evt);
@@ -396,6 +432,18 @@ public class GameWindow extends javax.swing.JFrame {
         BOARD_0_0.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BOARD_0_0MouseClicked(evt);
+            }
+        });
+
+        BOARD_1_0.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_0MouseClicked(evt);
+            }
+        });
+
+        BOARD_1_4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BOARD_1_4MouseClicked(evt);
             }
         });
 
@@ -422,7 +470,7 @@ public class GameWindow extends javax.swing.JFrame {
                     .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -443,41 +491,38 @@ public class GameWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(87, 87, 87))
+                            .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(131, 131, 131)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -637,7 +682,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 1;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_0_1;
+//        jt = BOARD_0_1;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_0_1MouseClicked
@@ -649,7 +695,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 2;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_0_2;
+//        jt = BOARD_0_2;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_0_2MouseClicked
@@ -661,7 +708,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 3;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_0_3;
+//        jt = BOARD_0_3;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_0_3MouseClicked
@@ -673,22 +721,11 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 4;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_0_4;
+//        jt = BOARD_0_4;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_0_4MouseClicked
-
-    private void BOARD_1_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_0MouseClicked
-        // TODO add your handling code here:
-        
-        int posX = 1;
-        int posY = 0;
-        
-        javax.swing.JToggleButton jt;
-        jt = BOARD_1_0;
-       
-        performClick(posX, posY, jt);
-    }//GEN-LAST:event_BOARD_1_0MouseClicked
 
     private void BOARD_1_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_1MouseClicked
         // TODO add your handling code here:
@@ -697,7 +734,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 1;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_1_1;
+//        jt = BOARD_1_1;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_1_1MouseClicked
@@ -709,7 +747,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 2;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_1_2;
+//        jt = BOARD_1_2;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_1_2MouseClicked
@@ -721,22 +760,11 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 3;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_1_3;
+//        jt = BOARD_1_3;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_1_3MouseClicked
-
-    private void BOARD_1_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_4MouseClicked
-        // TODO add your handling code here:
-        
-        int posX = 1;
-        int posY = 4;
-        
-        javax.swing.JToggleButton jt;
-        jt = BOARD_1_4;
-       
-        performClick(posX, posY, jt);
-    }//GEN-LAST:event_BOARD_1_4MouseClicked
 
     private void BOARD_2_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_2_0MouseClicked
         // TODO add your handling code here:
@@ -745,7 +773,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 0;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_2_0;
+//        jt = BOARD_2_0;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_2_0MouseClicked
@@ -757,7 +786,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 1;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_2_1;
+//        jt = BOARD_2_1;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_2_1MouseClicked
@@ -769,7 +799,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 2;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_2_2;
+//        jt = BOARD_2_2;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_2_2MouseClicked
@@ -781,7 +812,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 3;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_2_3;
+//        jt = BOARD_2_3;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_2_3MouseClicked
@@ -793,7 +825,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 4;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_2_4;
+//        jt = BOARD_2_4;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_2_4MouseClicked
@@ -805,7 +838,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 0;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_3_0;
+//        jt = BOARD_3_0;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_3_0MouseClicked
@@ -817,7 +851,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 1;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_3_1;
+//        jt = BOARD_3_1;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_3_1MouseClicked
@@ -829,7 +864,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 2;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_3_2;
+//        jt = BOARD_3_2;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_3_2MouseClicked
@@ -841,7 +877,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 3;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_3_3;
+//        jt = BOARD_3_3;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_3_3MouseClicked
@@ -853,7 +890,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 4;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_3_4;
+//        jt = BOARD_3_4;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_3_4MouseClicked
@@ -865,7 +903,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 0;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_4_0;
+//        jt = BOARD_4_0;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_4_0MouseClicked
@@ -877,7 +916,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 1;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_4_1;
+//        jt = BOARD_4_1;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_4_1MouseClicked
@@ -889,7 +929,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 2;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_4_2;
+//        jt = BOARD_4_2;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_4_2MouseClicked
@@ -901,7 +942,8 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 3;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_4_3;
+//        jt = BOARD_4_3;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_4_3MouseClicked
@@ -913,34 +955,11 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 4;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_4_4;
+//        jt = BOARD_4_4;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_4_4MouseClicked
-
-    private void BOARD_1_0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOARD_1_0ActionPerformed
-        // TODO add your handling code here:
-        
-        int posX = 1;
-        int posY = 0;
-        
-        javax.swing.JToggleButton jt;
-        jt = BOARD_1_0;
-       
-        performClick(posX, posY, jt);
-    }//GEN-LAST:event_BOARD_1_0ActionPerformed
-
-    private void BOARD_1_4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOARD_1_4ActionPerformed
-        // TODO add your handling code here:
-        
-        int posX = 1;
-        int posY = 4;
-        
-        javax.swing.JToggleButton jt;
-        jt = BOARD_1_4;
-       
-        performClick(posX, posY, jt);
-    }//GEN-LAST:event_BOARD_1_4ActionPerformed
 
     private void BOARD_0_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_0MouseClicked
         // TODO add your handling code here:
@@ -949,10 +968,37 @@ public class GameWindow extends javax.swing.JFrame {
         int posY = 0;
         
         javax.swing.JToggleButton jt;
-        jt = BOARD_0_0;
+//        jt = BOARD_0_0;
+        jt = buttons[posX][posY];
        
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_0_0MouseClicked
+
+    private void BOARD_1_0MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_0MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 0;
+        
+        javax.swing.JToggleButton jt;
+//        jt = BOARD_0_0;
+        jt = buttons[posX][posY];
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_0MouseClicked
+
+    private void BOARD_1_4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_1_4MouseClicked
+        // TODO add your handling code here:
+        
+        int posX = 1;
+        int posY = 4;
+        
+        javax.swing.JToggleButton jt;
+//        jt = BOARD_0_0;
+        jt = buttons[posX][posY];
+       
+        performClick(posX, posY, jt);
+    }//GEN-LAST:event_BOARD_1_4MouseClicked
 
     
     /* Takes the x, y position clicked on the board and the reference to the board's JToggleButton.
@@ -968,15 +1014,12 @@ public class GameWindow extends javax.swing.JFrame {
     private void performClick(int x, int y, javax.swing.JToggleButton jt) {
         // Check if a Piece has been selected already
         if (selectedPiece == null) {
-            // Check if there is a Piece to select at this board position
-            if (board[x][y] != null) {
-                // Check if the Piece is owned by the currentPlayer
-                if (board[x][y].getPlayer() == currentPlayer) {
-                    // Set selectedPiece to the Piece at this board position
-                    selectedPiece = board[x][y];
-                }
+            // Check if there is a Piece for currentPlayer to select at this board position
+            if ((board[x][y] != null) && board[x][y].getPlayer() == currentPlayer) {
+                // Set selectedPiece to the Piece at this board position
+                selectedPiece = board[x][y];
             }
-            // There is no Piece, so do not select this position
+            // There is no Piece for the currentPlayer here, so do not select this position
             else {
                 jt.setSelected(false);
             }
@@ -989,22 +1032,379 @@ public class GameWindow extends javax.swing.JFrame {
                 selectedPiece = null;
                 jt.setSelected(false);
             }
-            // New position contains a Piece already
-            else if (board[x][y] != null) {
-                ;
-            }
-            // New position does not contain any Piece
+            // Move Piece to new position if it is a valid move
             else {
-                ;
+                if (isValidMove(x, y)) {
+                    // unselect buttons since a valid move was made
+                    buttons[selectedPiece.getX()][selectedPiece.getY()].setSelected(false);
+                    jt.setSelected(false);
+                    
+                    // update the board, Pieces, and Players Piece lists
+                    makeMove(x, y, jt);
+                    
+                    // unselect the Piece now that move has been made
+                    selectedPiece = null;
+                    
+                    // check to see if currentPlayer won with that move
+                    if (checkWin(currentPlayer)) {
+                        winner = currentPlayer;
+                        gameOver = true;
+                    }
+                    // check to see if the other Player won with that move
+                    else {
+                        if (currentPlayer == userPlayer) {
+                            if (checkWin(compPlayer)) {
+                                winner = compPlayer;
+                                gameOver = true;
+                            }
+                        }
+                        else {
+                            if (checkWin(userPlayer)) {
+                                winner = userPlayer;
+                                gameOver = true;
+                            }
+                        }
+                    }
+                    
+                    changeTurn();
+                }
+                // move is not valid so do not select new position
+                else {
+                    jt.setSelected(false);
+                }
             }
         }        
     }
     
-    public boolean isValidMove() {
+    
+    private void makeMove(int x, int y, javax.swing.JToggleButton jt) {
+        // the move will overtake an enemy's Piece
+        if ((board[x][y] != null) && (board[x][y].getPlayer() != currentPlayer)) {
+            // Remove the Piece overtaken from the enemy Player's Pieces' list
+            board[x][y].getPlayer().removePiece(board[x][y]);
+        }
+        
+        // Update the GUI so that the selectedPiece's position is moved
+        buttons[selectedPiece.getX()][selectedPiece.getY()].setText("");
+        buttons[x][y].setText(selectedPiece.getPlayer().getPlayerLetter());
+        
+        // Move the Piece on the board
+        board[x][y] = selectedPiece;
+        board[selectedPiece.getX()][selectedPiece.getY()] = null;
+        
+        // Update the Piece's position
+        selectedPiece.setPos(x, y);
+        
+    }
+    
+    // Checks to see if the p just won the game
+    private boolean checkWin(Player p) {
+        return p.allConnected();
+    }
+
+    // returns true if the new selected position is a valid move. otherwise false.
+    public boolean isValidMove(int x, int y) {
+        int pX = selectedPiece.getX();
+        int pY = selectedPiece.getY();
+        
+        // Number of spaces the selectedPiece can move in some direction
+        int moveSpaces;
+        
+        // Holder for a code to determine moving path
+        int path;
+        
+        // selectedPiece and new position are in the same row
+        if (pX == x) {
+            moveSpaces = getPiecesInRow(selectedPiece);
+            path = ROW;
+        }
+        // selectedPiece and new position are in the same column
+        else if (pY == y) {
+            moveSpaces = getPiecesInColumn(selectedPiece);
+            path = COLUMN;
+        }
+        // selectedPiece and new position are in the same diagonal
+        else if (Math.abs(pX - pY) == Math.abs(x - y)) {
+            // left-to-right diagonal
+            if (onLeftToRightDiagonal(pX, pY, x, y)) {
+                moveSpaces = getPiecesInLeftToRightDiagonal(selectedPiece);
+                path = LR_DIAG;
+            }
+            // right-to-left diagonal
+            else {
+                moveSpaces = getPiecesInRightToLeftDiagonal(selectedPiece);
+                path = RL_DIAG;
+            }
+        }
+        // selectedPiece cannot move to new position in any way
+        else {
+            return false;
+        }
+        
+        return checkMove(pX, pY, x, y, moveSpaces, path);
+    }
+    
+    // returns true if the move to a new position is valid. otherwise false.
+    private boolean checkMove(int pX, int pY, int x, int y, int moveSpaces, int path) {
+        switch (path) {
+            case ROW:
+                return checkRow(pX, pY, x, y, moveSpaces);
+       
+            case COLUMN:
+                return checkColumn(pX, pY, x, y, moveSpaces);
+                
+            case LR_DIAG:
+                return checkLRDiag(pX, pY, x, y, moveSpaces);
+                
+            case RL_DIAG:
+                return checkRLDiag(pX, pY, x, y, moveSpaces);
+                
+            default:
+                return false;
+        }
+    }
+ 
+    // returns true if the row-wise movement is valid
+    private boolean checkRow(int pX, int pY, int x, int y, int moveSpaces) {
+        Piece tempPiece;
+
+        if (pY > y) {
+            // return false if the move would go off the board
+            if ((pY - moveSpaces) < 0) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check previous position in the row
+                    tempPiece = board[pX][pY - i];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on enemy Piece
+                    else if ((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        else {
+            // return false if the move would go off the board
+            if ((pY + moveSpaces) >= boardSize) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check next position in the row
+                    tempPiece = board[pX][pY + i];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on an enemy Piece
+                    else if((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        
         return true;
     }
     
-    public int getPiecesInRow(Piece p) {
+    // returns true if the column-wise movement is valid
+    private boolean checkColumn(int pX, int pY, int x, int y, int moveSpaces) {
+        Piece tempPiece;
+
+        if (pX > x) {
+            // return false if the move would go off the board
+            if ((pX - moveSpaces) < 0) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check previous position in the column
+                    tempPiece = board[pX - i][pY];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on enemy Piece
+                    else if ((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        else {
+            // return false if the move would go off the board
+            if ((pX + moveSpaces) >= boardSize) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check next position in the column
+                    tempPiece = board[pX + i][pY];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on an enemy Piece
+                    else if((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    // returns true if the diagonal-wise movement is valid
+    private boolean checkLRDiag(int pX, int pY, int x, int y, int moveSpaces) {
+        Piece tempPiece;
+
+        if (pX > x) {
+            // return false if the move would go off the board
+            if (((pX - moveSpaces) < 0) || ((pY - moveSpaces) < 0)) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check previous position in the up-and-left diagonal
+                    tempPiece = board[pX - i][pY - i];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on enemy Piece
+                    else if ((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        else {
+            // return false if the move would go off the board
+            if (((pX + moveSpaces) >= boardSize) || ((pY + moveSpaces) >= boardSize)) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check next position in the down-and-right diagonal
+                    tempPiece = board[pX + i][pY + i];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on an enemy Piece
+                    else if((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+     // returns true if the diagonal-wise movement is valid
+    private boolean checkRLDiag(int pX, int pY, int x, int y, int moveSpaces) {
+        Piece tempPiece;
+
+        if (pX > x) {
+            // return false if the move would go off the board
+            if (((pX - moveSpaces) < 0) || ((pY + moveSpaces) >= boardSize)) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check previous position in the up-and-left diagonal
+                    tempPiece = board[pX - i][pY + i];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on enemy Piece
+                    else if ((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        else {
+            // return false if the move would go off the board
+            if (((pX + moveSpaces) >= boardSize) || ((pY - moveSpaces) < 0)) {
+                return false;
+            }
+            // move does not go off board, so check if valid
+            else {
+                for (int i = 1; i <= moveSpaces; ++i) {
+                    // check next position in the down-and-right diagonal
+                    tempPiece = board[pX + i][pY - i];
+                    // an empty space is valid to move over
+                    if (tempPiece == null) {
+                        continue;
+                    }
+                    // moves cannot pass over an enemy Piece unless they can land directly on an enemy Piece
+                    else if((tempPiece.getPlayer() != currentPlayer) && (i != moveSpaces)) {
+                        return false;
+                    }
+                    // move encounters a friendly Piece
+                    else if ((tempPiece.getPlayer() == currentPlayer) && (i == moveSpaces)) {
+                        // move is invalid if we try to land on a friendly Piece
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    } 
+    
+    private int getPiecesInRow(Piece p) {
         int x = p.getX();
         
         int pieces = 0;
@@ -1018,7 +1418,7 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }
     
-    public int getPiecesInColumn(Piece p) {
+    private int getPiecesInColumn(Piece p) {
         int y = p.getY();
         
         int pieces = 0;
@@ -1032,7 +1432,7 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }
     
-    public int getPiecesInLeftToRightDiagonal(Piece p) {
+    private int getPiecesInLeftToRightDiagonal(Piece p) {
         int x = p.getX();
         int y = p.getY();
         
@@ -1066,7 +1466,7 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }
     
-    public int getPiecesInRightToLeftDiagonal(Piece p) {
+    private int getPiecesInRightToLeftDiagonal(Piece p) {
         int x = p.getX();
         int y = p.getY();
         
@@ -1074,27 +1474,6 @@ public class GameWindow extends javax.swing.JFrame {
         
         int pieces = 0;
         
-        // used to get starting diagonal position
-//        if (x < y) {
-//            if ((x + y) < boardSize) {
-//                startRow = 0;
-//                startColumn = x + y;
-//            }
-//            else {
-//                startRow = (x + y) - boardSize + 1;
-//                startColumn = boardSize - 1;
-//            }
-//        }
-//        else {
-//            if ((x + y) < boardSize) {
-//                startRow = 0;
-//                startColumn = x + y;
-//            }
-//            else {
-//                startRow = (x + y) - boardSize + 1;
-//                startColumn = boardSize - 1;
-//            }
-//        }
         if ((x + y) < boardSize) {
             startRow = 0;
             startColumn = x + y;
@@ -1120,49 +1499,25 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }  
         
-    /* Takes the x, y position clicked on the board and the reference to the board's JToggleButton.
-    Checks to see there was already a Piece selected:
-        If no: selects the Piece if the Piece is owned by the currentPlayer who's turn it is
-        If yes:
-            1) unselects the Piece if the same Piece is selected again
-            2) takes over a Piece if the new position contains a Piece owned
-               by the opposing player (and checks if such move is valid)
-            3) moves the selectedPiece to the new position which does not
-               contain any Piece (and checks if such move is valid)
-    */
-//        // Check if a Piece has been selected already
-//        if (selectedPiece == null) {
-//            // Check if there is a Piece to select at this board position
-//            if (board[x][y] != null) {
-//                // Check if the Piece is owned by the currentPlayer
-//                if (board[x][y].getPlayer() == currentPlayer) {
-//                    // Set selectedPiece to the Piece at this board position
-//                    selectedPiece = board[x][y];
-//                }
-//            }
-//            // There is no Piece, so do not select this position
-//            else {
-//                jt.setSelected(false);
-//            }
-//        }
-//        
-//        // A Piece has already been selected
-//        else {
-//            // Same Piece selected again so unselect it
-//            if (selectedPiece == board[x][y]) {
-//                selectedPiece = null;
-//                jt.setSelected(false);
-//            }
-//            // New position contains a Piece already
-//            else if (board[x][y] != null) {
-//                ;
-//            }
-//            // New position does not contain any Piece
-//            else {
-//                ;
-//            }
-//        }      
     
+    /* returns true if the selectedPiece's x,y are on a diagonal from
+       the TopLeft-to-BottomRight with the x,y of the new position.
+       return false otherwise.
+    */
+    private boolean onLeftToRightDiagonal(int pX, int pY, int x, int y) {
+        return ((pX > x) && (pY > y)) || ((pX < x) && (pY < y));
+    }
+    
+    
+    // Changes which Player's turn it is
+    private void changeTurn() {
+        if (currentPlayer == P1) {
+            currentPlayer = P2;
+        }
+        else if (currentPlayer == P2) {
+            currentPlayer = P1;
+        }
+    }
     
     
     

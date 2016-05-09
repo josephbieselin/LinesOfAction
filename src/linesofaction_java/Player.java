@@ -18,6 +18,11 @@ public class Player {
     private int numPieces = 6;
     final private List<Piece> pList;
     
+    // Used for GUI purposes
+    final private int P1_CODE = 1;
+    final private int P2_CODE = 2;
+    final String PLAYER1 = "x";
+    final String PLAYER2 = "o";
     
     // PUBLIC
     
@@ -34,6 +39,19 @@ public class Player {
     
     public int getValue() {
         return value;
+    }
+    
+    public String getPlayerLetter() {
+        String s = "";
+        
+        if (getValue() == P1_CODE) {
+            s = PLAYER1;
+        }
+        else if(getValue() == P2_CODE) {
+            s = PLAYER2;
+        }
+        
+        return s;
     }
     
     // Removes the passed in Piece from pList and decrements numPieces
@@ -63,7 +81,7 @@ public class Player {
         connected.add(pList.get(0));
         
         // remaining contains all the other pieces that must be checked
-        for (int i = 1; 1 < numPieces; ++i) {
+        for (int i = 1; i < numPieces; ++i) {
             remaining.add(pList.get(i));
         }
         
