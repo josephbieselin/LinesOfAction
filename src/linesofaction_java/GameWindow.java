@@ -1051,12 +1051,16 @@ public class GameWindow extends javax.swing.JFrame {
         }
         
         // loop over the diagonal (making sure not to go past the board's border)
-        for (int i = startRow; i < (boardSize - startColumn); ++i) {
-            for (int j = startColumn; j < (boardSize - startRow); ++i) {
-                if (board[i][j] != null) {
-                    ++pieces;
-                }
+        for (int i = startRow; i < boardSize; ++i) {
+            if (startColumn >= boardSize) {
+                break;
             }
+            
+            if (board[i][startColumn] != null) {
+                ++pieces;
+            }
+            
+            ++startColumn;
         }
         
         return pieces;
@@ -1071,31 +1075,46 @@ public class GameWindow extends javax.swing.JFrame {
         int pieces = 0;
         
         // used to get starting diagonal position
-        if (x < y) {
-            if ((x + y) < boardSize) {
-                startRow = 0;
-                startColumn = x + y;
-            }
-            else {
-                startRow = (x + y) - boardSize + 1;
-                startColumn = boardSize - 1;
-            }
+//        if (x < y) {
+//            if ((x + y) < boardSize) {
+//                startRow = 0;
+//                startColumn = x + y;
+//            }
+//            else {
+//                startRow = (x + y) - boardSize + 1;
+//                startColumn = boardSize - 1;
+//            }
+//        }
+//        else {
+//            if ((x + y) < boardSize) {
+//                startRow = 0;
+//                startColumn = x + y;
+//            }
+//            else {
+//                startRow = (x + y) - boardSize + 1;
+//                startColumn = boardSize - 1;
+//            }
+//        }
+        if ((x + y) < boardSize) {
+            startRow = 0;
+            startColumn = x + y;
         }
         else {
-            startRow = x + y;
-            if (startRow > (boardSize - 1)) {
-                startRow = boardSize - 1;
-            }
-            startColumn = 0;
+            startRow = (x + y) - boardSize + 1;
+            startColumn = boardSize - 1;
         }
         
         // loop over the diagonal (making sure not to go past the board's border)
-        for (int i = startRow; i < (boardSize - startColumn); ++i) {
-            for (int j = startColumn; j < (boardSize - startRow); ++i) {
-                if (board[i][j] != null) {
-                    ++pieces;
-                }
+        for (int i = startRow; i < boardSize; ++i) {
+            if (startColumn < 0) {
+                break;
             }
+            
+            if (board[i][startColumn] != null) {
+                ++pieces;
+            }
+            
+            --startColumn;
         }
         
         return pieces;
