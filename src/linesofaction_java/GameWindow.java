@@ -1083,6 +1083,12 @@ public class GameWindow extends javax.swing.JFrame {
             return;
         }
         
+        // Do nothing if hte user clicked something while it is the computer's turn
+        if (currentPlayer.getValue() == compPlayer.getValue()) {
+            jt.setSelected(false);
+            return;
+        }
+        
         // Check if a Piece has been selected already
         if (selectedPiece == null) {
             // Check if there is a Piece for currentPlayer to select at this board position
@@ -1243,6 +1249,10 @@ public class GameWindow extends javax.swing.JFrame {
             if ((pY - moveSpaces) != y) {
                 return false;
             }
+            // return false if the move goes off the board
+            else if ((pY - moveSpaces) < 0) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1267,6 +1277,10 @@ public class GameWindow extends javax.swing.JFrame {
         else {
             // return false if the move does not match the new position
             if ((pY + moveSpaces) != y) {
+                return false;
+            }
+            // return false if the move goes off the board
+            else if ((pY + moveSpaces) >= boardSize) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1303,6 +1317,10 @@ public class GameWindow extends javax.swing.JFrame {
             if ((pX - moveSpaces) != x) {
                 return false;
             }
+            // return false if the move goes off the board
+            else if ((pX - moveSpaces) < 0) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1327,6 +1345,10 @@ public class GameWindow extends javax.swing.JFrame {
         else {
             // return false if the move does not match the new position
             if ((pX + moveSpaces) != x) {
+                return false;
+            }
+            // return false if the move goes off the board
+            else if ((pX + moveSpaces) >= boardSize) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1363,6 +1385,10 @@ public class GameWindow extends javax.swing.JFrame {
             if (((pX - moveSpaces) != x) || ((pY - moveSpaces) != y)) {
                 return false;
             }
+            // return false if the move goes off the board
+            else if (((pX - moveSpaces) < 0) || ((pY - moveSpaces) < 0)) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1389,7 +1415,11 @@ public class GameWindow extends javax.swing.JFrame {
             if (((pX + moveSpaces) != x) || ((pY + moveSpaces) != y)) {
                 return false;
             }
-                        // move does not go off board, so check if valid
+            // return false if the move goes off the board
+            else if (((pX + moveSpaces) >= boardSize) || ((pY + moveSpaces) >= boardSize)) {
+                return false;
+            }
+            // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
                     // check next position in the down-and-right diagonal
@@ -1423,6 +1453,10 @@ public class GameWindow extends javax.swing.JFrame {
             if (((pX - moveSpaces) != x) || ((pY + moveSpaces) != y)) {
                 return false;
             }
+            // return false if the move goes off the board
+            else if (((pX - moveSpaces) < 0) || ((pY + moveSpaces) >= boardSize)) {
+                return false;
+            }
             // move does not go off board, so check if valid
             else {
                 for (int i = 1; i <= moveSpaces; ++i) {
@@ -1447,6 +1481,10 @@ public class GameWindow extends javax.swing.JFrame {
         else {
             // return false if the move does not match the new position
             if (((pX + moveSpaces) != x) || ((pY - moveSpaces) != y)) {
+                return false;
+            }
+            // return false if the move goes off the board
+            else if (((pX + moveSpaces) >= boardSize) || ((pY - moveSpaces) < 0)) {
                 return false;
             }
             // move does not go off board, so check if valid
@@ -1580,7 +1618,6 @@ public class GameWindow extends javax.swing.JFrame {
         return ((pX > x) && (pY > y)) || ((pX < x) && (pY < y));
     }
     
-    
     // Changes which Player's turn it is
     private void changeTurn() {
         if (currentPlayer == P1) {
@@ -1590,18 +1627,13 @@ public class GameWindow extends javax.swing.JFrame {
             currentPlayer = P1;
         }
     }
-    
  
     /*
     Computer Player wins with utility of +100 (MAX)
     User Player wins with utility of -100 (MIN)
     Draw is utility of 0
     */
-    
-    private int[] ALPHA_BETA_SEARCH() {
-        // the returned action will be the new x,y position for selectedPiece to move to
-        int movePos[] = new int[2];
-        
+    private PieceAndDir ALPHA_BETA_SEARCH(Map<Integer, PieceAndDir> state) {
         /*
         Create temp Players with Piece lists identical to the current state
         to test for MIN & MAX values without. This is done as to not change
@@ -1622,12 +1654,115 @@ public class GameWindow extends javax.swing.JFrame {
         // Create the removedPieces List to store Pieces overtaken in MIN/MAX calls
         removedPieces = new ArrayList<>(boardSize * 2);
         
+        int v = MAX_VALUE(state, MIN, MAX, 0);
         
-        return movePos;
+        // return the Piece and its corresponding direction to move with max utility
+        return state.get(v);
+    }
+
+    
+    // returns a utility value for the best possible move
+    private int MAX_VALUE(Map<Integer, PieceAndDir> state, int alpha, int beta, int depth) {
+        /* Terminal Test to see if either Player won */
+        // User Player checked first since MAX_VALUE will be called after User moves
+        if (tempUserPlayer.allConnected()) {
+            return MIN;
+        }
+        else if (tempCompPlayer.allConnected()) {
+            return MAX;
+        }
+ 
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        /* Update currentPlayer to test moves for AI Player */
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        currentPlayer = tempCompPlayer;
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // v is initially the minimum possible value
+        int v = MIN;
+        
+        // used to signify whether an opponent Piece was taken in a move made
+        boolean pieceTaken;
+        Piece removedPiece;
+        
+        int compX, compY;
+        int compMoveSpaces;
+        int compDirection;
+    
+        // Test all moves with every Piece (up, up-right, right, right-down, etc.)
+        for (Piece p : tempCompPlayer.getPieces()) {
+            ////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
+            /* Update selectedPiece to test moves for 1 of the Pieces */
+            ////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
+            selectedPiece = p;
+            
+            // original x,y position of the selectedPiece to move
+            compX = selectedPiece.getX();
+            compY = selectedPiece.getY();
+            
+            for (int i = 0; i < numMoves; ++i) {
+                compDirection = i;
+                compMoveSpaces = checkMove(selectedPiece, compDirection, tempGameBoard);
+                // compMoveSpaces is a positive int if the move is valid
+                if (compMoveSpaces != 0) {
+                    // pieceTaken == true if a Piece was overtaken in makeMove
+                    pieceTaken = makeMove(selectedPiece, compDirection, compMoveSpaces, tempGameBoard);
+                   
+                    // Call MIN_VALUE and update v if needed
+                    v = Math.max(v, MIN_VALUE(alpha, beta, depth+1));
+                    
+                    currentPlayer = tempCompPlayer;
+                    selectedPiece = p;
+                    
+                    // Add the current Piece and its direction to the state with utility v
+                    state.put(v, new PieceAndDir(selectedPiece, i));
+                    
+                    /* Get state back to where it was before any move was made */
+                    tempGameBoard[compX][compY] = selectedPiece;
+//                    selectedPiece.setPos(compX, compY);
+                    // Must place the Piece removed back onto the board to maintain state
+                    if (pieceTaken) {
+                        // Return the removed Piece to the board and to the Player's list
+                        removedPiece = removedPieces.remove(removedPieces.size()-1);
+                        tempGameBoard[removedPiece.getX()][removedPiece.getY()] = removedPiece;
+                        removedPiece.getPlayer().addPiece(removedPiece);
+                    }
+                    // Just move the selectedPiece back to its location before move was made to maintain state
+                    else {
+                        // No Piece was in the position moved to so return that position to null
+                        tempGameBoard[selectedPiece.getX()][selectedPiece.getY()] = null;
+                    }
+                    selectedPiece.setPos(compX, compY);
+                    
+                    // Return v if we've hit the max possible utility in this tree
+                    if (v >= beta) {
+                        return v;
+                    }
+                    // update alpha 
+                    alpha = Math.max(alpha, v);
+                }
+            }
+        }
+        
+        return v;
     }
     
     // returns a utility value for the best possible move
     private int MAX_VALUE(int alpha, int beta, int depth) {
+        
+        System.out.println(depth);
+        
+        
+        
         /* Terminal Test to see if either Player won */
         // User Player checked first since MAX_VALUE will be called after User moves
         if (tempUserPlayer.allConnected()) {
@@ -1808,8 +1943,6 @@ public class GameWindow extends javax.swing.JFrame {
         return v;
     }
     
-    
-    
     // Return the number of spaces to move if it is a valid move. Otherwise return 0.
     private int checkMove(Piece p, int direction, Piece[][] board) {
         int moveSpaces;
@@ -1938,19 +2071,135 @@ public class GameWindow extends javax.swing.JFrame {
         if ((board[x][y] != null) && (board[x][y].getPlayer() != currentPlayer)) {
             // Remove the Piece overtaken from the enemy Player's Pieces' list
             removedPieces.add(board[x][y]);
-            gameBoard[x][y].getPlayer().removePiece(gameBoard[x][y]);
+            board[x][y].getPlayer().removePiece(board[x][y]);
             takenOver = true;
         }
         
         // Move the Piece on the board
-        gameBoard[x][y] = selectedPiece;
-        gameBoard[selectedPiece.getX()][selectedPiece.getY()] = null;
+        board[x][y] = selectedPiece;
+        board[selectedPiece.getX()][selectedPiece.getY()] = null;
         
         // Update the Piece's position
         selectedPiece.setPos(x, y);     
         
         return takenOver;
     }  
+
+    // Actually make the move for the computer turn
+    private void makeMove(Piece p, int direction, Piece[][] board) {
+        // Number of spaces to move
+        int moveSpaces = 0;
+        
+        // selectedPiece's x,y
+        int pX = p.getX();
+        int pY = p.getY();
+      
+        // position to move to's x,y
+        int x = pX;
+        int y = pY;
+        
+        // Get the number of spaces to be moved in the direction and update moveSpaces and validMove accordingly
+        switch(direction) {
+            case UP:
+                moveSpaces = getPiecesInColumn(p, board);
+                // Only the x-row value is changed to move up the rows
+                x -= moveSpaces;
+                break;
+                
+            case UP_RIGHT:
+                moveSpaces = getPiecesInRightToLeftDiagonal(p, board);
+                x -= moveSpaces;
+                y += moveSpaces;
+                break;
+                
+            case RIGHT:
+                moveSpaces = getPiecesInRow(p, board);
+                // Only the y-column value is changed to move right in the columns
+                y += moveSpaces;
+                break;
+                
+            case DOWN_RIGHT:
+                moveSpaces = getPiecesInLeftToRightDiagonal(p, board);
+                x += moveSpaces;
+                y += moveSpaces;
+                break;
+                
+            case DOWN:
+                moveSpaces = getPiecesInColumn(p, board);
+                // Only the x-row value is changed to move down the rows
+                x += moveSpaces;
+                break;
+                
+            case DOWN_LEFT:
+                moveSpaces = getPiecesInRightToLeftDiagonal(p, board);
+                x += moveSpaces;
+                y -= moveSpaces;
+                break;
+                
+            case LEFT:
+                moveSpaces = getPiecesInRow(p, board);
+                // Only the y-column value is changed to move left in the columns
+                y -= moveSpaces;
+                break;
+                
+            case UP_LEFT:
+                moveSpaces = getPiecesInLeftToRightDiagonal(p, board);
+                x -= moveSpaces;
+                y -= moveSpaces;
+                break;
+        }
+        
+        // Update the actual gameBoard with the computer's move
+        makeMove(x, y, buttons[x][y]);
+    }
+    
+    // Runs the game after user chooses to be Black (x) or White(o) Player
+    private void playGame() {
+        // Used for Alpha-Beta Search
+        Map<Integer, PieceAndDir> state;
+        PieceAndDir pieceToMove;
+        
+        // Play the game until it is over
+        while (!gameOver) {
+            if (currentPlayer == compPlayer) {
+                // disable the buttons when it is the computer's turn
+                disableButtons();
+                
+                state = new HashMap<>();
+                pieceToMove = ALPHA_BETA_SEARCH(state);
+                
+                // Update our selectedPiece and make the move the AI chose
+                selectedPiece = gameBoard[pieceToMove.p.getX()][pieceToMove.p.getY()];
+                makeMove(selectedPiece, pieceToMove.dir, gameBoard);
+                
+                if (compPlayer.allConnected()) {
+                    winner = compPlayer;
+                    gameOver = true;
+                }
+                else if (userPlayer.allConnected()) {
+                    winner = userPlayer;
+                    gameOver = true;
+                }
+                
+                // Reset so no Piece is selected
+                selectedPiece = null;
+                        
+                // enable the buttons after the computer made its move
+                enableButtons();
+                
+                // change the turn back to userPlayer
+                changeTurn();
+            }
+        }
+        
+        // Display the winner
+        if (winner == userPlayer) {
+            DISPLAY_WINNER_TEXT_FIELD.setText("User Wins!");
+        }
+        else if (winner == compPlayer) {
+            DISPLAY_WINNER_TEXT_FIELD.setText("Computer Wins!");
+        }
+    }
 
     
     /**
@@ -1980,15 +2229,18 @@ public class GameWindow extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GameWindow().setVisible(true);
+//                new GameWindow().setVisible(true);
+                // Create and display the Game
+                GameWindow gw = new GameWindow();
+                gw.setVisible(true);
             }
         });
         
-        // Run the game between the two players
-        
+//        playGame();
     }
     
 
