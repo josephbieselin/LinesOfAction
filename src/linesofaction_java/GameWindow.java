@@ -31,7 +31,7 @@ public class GameWindow extends javax.swing.JFrame {
     
     // The Game Board is a square matrix of boardSize-by-boardSize made up of Piece objects
     final public int boardSize = 5;
-    private final Piece board[][];
+    private final Piece gameBoard[][];
     // The Game Board gets user input through JToggleButton objects
     private final javax.swing.JToggleButton buttons[][];
     
@@ -50,8 +50,10 @@ public class GameWindow extends javax.swing.JFrame {
     
     /* ALPHA-BETA SEARCH ALGORITHM variables */
     // Temporary Players used to check new states of the game
-    Player tempCompPlayer;
-    Player tempUserPlayer;
+    private Player tempCompPlayer;
+    private Player tempUserPlayer;
+    // Temporary board
+    private Piece tempGameBoard[][];
     // Utility values for Alpha-Beta Search Algorithm
     private final int MAX = 100;
     private final int MIN = -100;
@@ -80,12 +82,12 @@ public class GameWindow extends javax.swing.JFrame {
         gameOver = false;
         
         // Initialize the 2D board with null
-        board = new Piece[boardSize][boardSize];
+        gameBoard = new Piece[boardSize][boardSize];
         buttons = new javax.swing.JToggleButton[boardSize][boardSize];
         
         for (int i = 0; i < boardSize; ++i)
             for (int j = 0; j < boardSize; ++j)
-                board[i][j] = null;
+                gameBoard[i][j] = null;
         
 
         // Store JToggleButtons into the buttons array
@@ -106,24 +108,24 @@ public class GameWindow extends javax.swing.JFrame {
             /* Player 1 - Black Player (x on the board) */
             // Top Row
             tempPiece = new Piece(0, i, P1);
-            board[0][i] = tempPiece;
+            gameBoard[0][i] = tempPiece;
             P1.addPiece(tempPiece);
             buttons[0][i].setText(tempPiece.getPlayer().getPlayerLetter());
             // Bottom Row
             tempPiece = new Piece(boardSize - 1, i, P1);
-            board[boardSize - 1][i] = tempPiece;
+            gameBoard[boardSize - 1][i] = tempPiece;
             P1.addPiece(tempPiece);
             buttons[boardSize - 1][i].setText(tempPiece.getPlayer().getPlayerLetter());
             
             /* Player 2 - White Player (o on the board) */
             // Left Column
             tempPiece = new Piece(i, 0, P2);
-            board[i][0] = tempPiece;
+            gameBoard[i][0] = tempPiece;
             P2.addPiece(tempPiece);
             buttons[i][0].setText(tempPiece.getPlayer().getPlayerLetter());
             // Right Column
             tempPiece = new Piece(i, boardSize - 1, P2);
-            board[i][boardSize - 1] = tempPiece;
+            gameBoard[i][boardSize - 1] = tempPiece;
             buttons[i][boardSize - 1].setText(tempPiece.getPlayer().getPlayerLetter());
             P2.addPiece(tempPiece);
         }
@@ -1064,9 +1066,9 @@ public class GameWindow extends javax.swing.JFrame {
         // Check if a Piece has been selected already
         if (selectedPiece == null) {
             // Check if there is a Piece for currentPlayer to select at this board position
-            if ((board[x][y] != null) && board[x][y].getPlayer() == currentPlayer) {
+            if ((gameBoard[x][y] != null) && gameBoard[x][y].getPlayer() == currentPlayer) {
                 // Set selectedPiece to the Piece at this board position
-                selectedPiece = board[x][y];
+                selectedPiece = gameBoard[x][y];
             }
             // There is no Piece for the currentPlayer here, so do not select this position
             else {
@@ -1077,13 +1079,13 @@ public class GameWindow extends javax.swing.JFrame {
         // A Piece has already been selected
         else {
             // Same Piece selected again so unselect it
-            if (selectedPiece == board[x][y]) {
+            if (selectedPiece == gameBoard[x][y]) {
                 selectedPiece = null;
                 jt.setSelected(false);
             }
             // Move Piece to new position if it is a valid move
             else {
-                if (isValidMove(x, y)) {
+                if (isValidMove(x, y, gameBoard)) {
                     // unselect buttons since a valid move was made
                     buttons[selectedPiece.getX()][selectedPiece.getY()].setSelected(false);
                     jt.setSelected(false);
@@ -1128,9 +1130,9 @@ public class GameWindow extends javax.swing.JFrame {
     // updates Game elements when a valid move is made
     private void makeMove(int x, int y, javax.swing.JToggleButton jt) {
         // the move will overtake an enemy's Piece
-        if ((board[x][y] != null) && (board[x][y].getPlayer() != currentPlayer)) {
+        if ((gameBoard[x][y] != null) && (gameBoard[x][y].getPlayer() != currentPlayer)) {
             // Remove the Piece overtaken from the enemy Player's Pieces' list
-            board[x][y].getPlayer().removePiece(board[x][y]);
+            gameBoard[x][y].getPlayer().removePiece(gameBoard[x][y]);
         }
         
         // Update the GUI so that the selectedPiece's position is moved
@@ -1138,8 +1140,8 @@ public class GameWindow extends javax.swing.JFrame {
         buttons[x][y].setText(selectedPiece.getPlayer().getPlayerLetter());
         
         // Move the Piece on the board
-        board[x][y] = selectedPiece;
-        board[selectedPiece.getX()][selectedPiece.getY()] = null;
+        gameBoard[x][y] = selectedPiece;
+        gameBoard[selectedPiece.getX()][selectedPiece.getY()] = null;
         
         // Update the Piece's position
         selectedPiece.setPos(x, y);
@@ -1152,7 +1154,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
 
     // returns true if the new selected position is a valid move. otherwise false.
-    public boolean isValidMove(int x, int y) {
+    public boolean isValidMove(int x, int y, Piece[][] board) {
         int pX = selectedPiece.getX();
         int pY = selectedPiece.getY();
         
@@ -1164,24 +1166,24 @@ public class GameWindow extends javax.swing.JFrame {
         
         // selectedPiece and new position are in the same row
         if (pX == x) {
-            moveSpaces = getPiecesInRow(selectedPiece);
+            moveSpaces = getPiecesInRow(selectedPiece, board);
             path = ROW;
         }
         // selectedPiece and new position are in the same column
         else if (pY == y) {
-            moveSpaces = getPiecesInColumn(selectedPiece);
+            moveSpaces = getPiecesInColumn(selectedPiece, board);
             path = COLUMN;
         }
         // selectedPiece and new position are in the same diagonal
         else if (onDiagonal(pX, pY, x, y)) {
             // left-to-right diagonal
             if (onLeftToRightDiagonal(pX, pY, x, y)) {
-                moveSpaces = getPiecesInLeftToRightDiagonal(selectedPiece);
+                moveSpaces = getPiecesInLeftToRightDiagonal(selectedPiece, board);
                 path = LR_DIAG;
             }
             // right-to-left diagonal
             else {
-                moveSpaces = getPiecesInRightToLeftDiagonal(selectedPiece);
+                moveSpaces = getPiecesInRightToLeftDiagonal(selectedPiece, board);
                 path = RL_DIAG;
             }
         }
@@ -1190,23 +1192,23 @@ public class GameWindow extends javax.swing.JFrame {
             return false;
         }
         
-        return checkMove(pX, pY, x, y, moveSpaces, path);
+        return checkMove(pX, pY, x, y, moveSpaces, path, board);
     }
     
     // returns true if the move to a new position is valid. otherwise false.
-    private boolean checkMove(int pX, int pY, int x, int y, int moveSpaces, int path) {
+    private boolean checkMove(int pX, int pY, int x, int y, int moveSpaces, int path, Piece[][] board) {
         switch (path) {
             case ROW:
-                return checkRow(pX, pY, x, y, moveSpaces);
+                return checkRow(pX, pY, x, y, moveSpaces, board);
        
             case COLUMN:
-                return checkColumn(pX, pY, x, y, moveSpaces);
+                return checkColumn(pX, pY, x, y, moveSpaces, board);
                 
             case LR_DIAG:
-                return checkLRDiag(pX, pY, x, y, moveSpaces);
+                return checkLRDiag(pX, pY, x, y, moveSpaces, board);
                 
             case RL_DIAG:
-                return checkRLDiag(pX, pY, x, y, moveSpaces);
+                return checkRLDiag(pX, pY, x, y, moveSpaces, board);
                 
             default:
                 return false;
@@ -1214,7 +1216,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
  
     // returns true if the row-wise movement is valid
-    private boolean checkRow(int pX, int pY, int x, int y, int moveSpaces) {
+    private boolean checkRow(int pX, int pY, int x, int y, int moveSpaces, Piece[][] board) {
         Piece tempPiece;
 
         if (pY > y) {
@@ -1274,7 +1276,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
     // returns true if the column-wise movement is valid
-    private boolean checkColumn(int pX, int pY, int x, int y, int moveSpaces) {
+    private boolean checkColumn(int pX, int pY, int x, int y, int moveSpaces, Piece[][] board) {
         Piece tempPiece;
 
         if (pX > x) {
@@ -1334,7 +1336,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
     // returns true if the diagonal-wise movement is valid
-    private boolean checkLRDiag(int pX, int pY, int x, int y, int moveSpaces) {
+    private boolean checkLRDiag(int pX, int pY, int x, int y, int moveSpaces, Piece[][] board) {
         Piece tempPiece;
 
         if (pX > x) {
@@ -1394,7 +1396,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
      // returns true if the diagonal-wise movement is valid
-    private boolean checkRLDiag(int pX, int pY, int x, int y, int moveSpaces) {
+    private boolean checkRLDiag(int pX, int pY, int x, int y, int moveSpaces, Piece[][] board) {
         Piece tempPiece;
 
         if (pX > x) {
@@ -1453,7 +1455,7 @@ public class GameWindow extends javax.swing.JFrame {
         return true;
     } 
     
-    private int getPiecesInRow(Piece p) {
+    private int getPiecesInRow(Piece p, Piece[][] board) {
         int x = p.getX();
         
         int pieces = 0;
@@ -1467,7 +1469,7 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }
     
-    private int getPiecesInColumn(Piece p) {
+    private int getPiecesInColumn(Piece p, Piece[][] board) {
         int y = p.getY();
         
         int pieces = 0;
@@ -1481,7 +1483,7 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }
     
-    private int getPiecesInLeftToRightDiagonal(Piece p) {
+    private int getPiecesInLeftToRightDiagonal(Piece p, Piece[][] board) {
         int x = p.getX();
         int y = p.getY();
         
@@ -1504,7 +1506,7 @@ public class GameWindow extends javax.swing.JFrame {
         return pieces;
     }
     
-    private int getPiecesInRightToLeftDiagonal(Piece p) {
+    private int getPiecesInRightToLeftDiagonal(Piece p, Piece[][] board) {
         int x = p.getX();
         int y = p.getY();
         
@@ -1589,6 +1591,14 @@ public class GameWindow extends javax.swing.JFrame {
         tempCompPlayer = new Player(compPlayer);
         tempUserPlayer = new Player(userPlayer);
         
+        // Create temp board to test with
+        tempGameBoard = new Piece[boardSize][boardSize];
+        for (Piece p : tempCompPlayer.getPieces()) {
+            tempGameBoard[p.getX()][p.getY()] = p;
+        }
+        for (Piece p : tempUserPlayer.getPieces()) {
+            tempGameBoard[p.getX()][p.getY()] = p;
+        }
         
         
         return movePos;
@@ -1596,20 +1606,27 @@ public class GameWindow extends javax.swing.JFrame {
     
     private int MAX_VALUE() {
         // Terminal Test to see if either Player won
-        if (compPlayer.allConnected()) {
+        if (tempCompPlayer.allConnected()) {
             return MAX;
         }
-        else if (userPlayer.allConnected()) {
+        else if (tempUserPlayer.allConnected()) {
             return MIN;
         }
         
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         
         double v = Double.NEGATIVE_INFINITY;
         
-        for (Piece p : compPlayer.getPieces()) {
+        // Test all moves with every Piece (up, up-right, right, right-down, etc.)
+        for (Piece p : tempCompPlayer.getPieces()) {
             
         }
+        
+        return 1;
     }
     
     
