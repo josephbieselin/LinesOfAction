@@ -1987,6 +1987,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
         
+        // Run the game between the two players
+        
     }
     
 
