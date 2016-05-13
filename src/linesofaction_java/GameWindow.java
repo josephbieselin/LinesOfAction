@@ -59,6 +59,23 @@ public class GameWindow extends javax.swing.JFrame {
     private final int MIN = -100;
     private final int DRAW = 0;
     
+    // Stores the values for which move should be made at end of Alpha-Beta Algorithm
+    int compX, compY;
+    int compMoveSpaces;
+    int compDirection;
+    
+    
+    // Variable/Codes for AI Movement
+    private final int numMoves = 8; // up, right, down, left, diagonally in 4 ways
+    private final int UP            = 0;
+    private final int UP_RIGHT      = 1;
+    private final int RIGHT         = 2;
+    private final int DOWN_RIGHT    = 3;
+    private final int DOWN          = 4;
+    private final int DOWN_LEFT     = 5;
+    private final int LEFT          = 6;
+    private final int UP_LEFT       = 7;
+    
     // END OF OBJECT VARIABLES
     
     
@@ -1612,24 +1629,110 @@ public class GameWindow extends javax.swing.JFrame {
         else if (tempUserPlayer.allConnected()) {
             return MIN;
         }
-        
+ 
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        /* Update currentPlayer to test moves for AI Player */
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        currentPlayer = compPlayer;
+
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         
-        double v = Double.NEGATIVE_INFINITY;
+        // v is initially the minimum possible value
+        int v = MIN;
+        
         
         // Test all moves with every Piece (up, up-right, right, right-down, etc.)
         for (Piece p : tempCompPlayer.getPieces()) {
+            ////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
+            /* Update selectedPiece to test moves for 1 of the Pieces */
+            ////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
+            selectedPiece = p;
             
+            compX = selectedPiece.getX();
+            compY = selectedPiece.getY();
+            
+            for (int i = 0; i < numMoves; ++i) {
+                compDirection = i;
+                compMoveSpaces = checkMove(selectedPiece, i, tempGameBoard);
+                
+            }
         }
         
         return 1;
     }
     
-    
+    // Return the number of spaces to move if it is a valid move. Otherwise return 0.
+    private int checkMove(Piece p, int direction, Piece[][] board) {
+        int moveSpaces;
+        int pX = p.getX();
+        int pY = p.getY();
+        
+        boolean validMove;
+        
+        // Get the number of spaces to be moved in the direction and update moveSpaces and validMove accordingly
+        switch(direction) {
+            case UP:
+                moveSpaces = getPiecesInColumn(p, board);
+                validMove = isValidMove(pX - moveSpaces, pY, board);
+                break;
+                
+            case UP_RIGHT:
+                moveSpaces = getPiecesInRightToLeftDiagonal(p, board);
+                validMove = isValidMove(pX - moveSpaces, pY + moveSpaces, board);
+                break;
+                
+            case RIGHT:
+                moveSpaces = getPiecesInRow(p, board);
+                validMove = isValidMove(pX, pY + moveSpaces, board);
+                break;
+                
+            case DOWN_RIGHT:
+                moveSpaces = getPiecesInLeftToRightDiagonal(p, board);
+                validMove = isValidMove(pX + moveSpaces, pY + moveSpaces, board);
+                break;
+                
+            case DOWN:
+                moveSpaces = getPiecesInColumn(p, board);
+                validMove = isValidMove(pX + moveSpaces, pY, board);
+                break;
+                
+            case DOWN_LEFT:
+                moveSpaces = getPiecesInRightToLeftDiagonal(p, board);
+                validMove = isValidMove(pX + moveSpaces, pY - moveSpaces, board);
+                break;
+                
+            case LEFT:
+                moveSpaces = getPiecesInRow(p, board);
+                validMove = isValidMove(pX, pY - moveSpaces, board);
+                break;
+                
+            case UP_LEFT:
+                moveSpaces = getPiecesInLeftToRightDiagonal(p, board);
+                validMove = isValidMove(pX - moveSpaces, pY - moveSpaces, board);
+                break;
+                
+            default:
+                return 0;
+        }
+        
+        // The move was valid so return the number of spaces that is a valid move
+        if (validMove) {
+            return moveSpaces;
+        }
+        // The move was not valid so return a 0
+        else {
+            return 0;
+        }
+        
+    }
     
 
     
