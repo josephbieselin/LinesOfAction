@@ -59,10 +59,10 @@ public class GameWindow extends javax.swing.JFrame {
     private final int MIN = -100;
     private final int DRAW = 0;
     
-    // Stores the values for which move should be made at end of Alpha-Beta Algorithm
-    int compX, compY;
-    int compMoveSpaces;
-    int compDirection;
+//    // Stores the values for which move should be made at end of Alpha-Beta Algorithm
+//    int compX, compY;
+//    int compMoveSpaces;
+//    int compDirection;
     
     
     // Variable/Codes for AI Movement
@@ -75,6 +75,9 @@ public class GameWindow extends javax.swing.JFrame {
     private final int DOWN_LEFT     = 5;
     private final int LEFT          = 6;
     private final int UP_LEFT       = 7;
+    
+    // List that stores Pieces overtaken in MIN/MAX calls
+    private List<Piece> removedPieces;
     
     // END OF OBJECT VARIABLES
     
@@ -1162,7 +1165,6 @@ public class GameWindow extends javax.swing.JFrame {
         
         // Update the Piece's position
         selectedPiece.setPos(x, y);
-        
     }
     
     // Checks to see if the p just won the game
@@ -1617,12 +1619,108 @@ public class GameWindow extends javax.swing.JFrame {
             tempGameBoard[p.getX()][p.getY()] = p;
         }
         
+        // Create the removedPieces List to store Pieces overtaken in MIN/MAX calls
+        removedPieces = new ArrayList<>(boardSize * 2);
+        
         
         return movePos;
     }
     
-    private int MAX_VALUE() {
-        // Terminal Test to see if either Player won
+    // returns a utility value for the best possible move
+    private int MAX_VALUE(int alpha, int beta, int depth) {
+        /* Terminal Test to see if either Player won */
+        // User Player checked first since MAX_VALUE will be called after User moves
+        if (tempUserPlayer.allConnected()) {
+            return MIN;
+        }
+        else if (tempCompPlayer.allConnected()) {
+            return MAX;
+        }
+ 
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        /* Update currentPlayer to test moves for AI Player */
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        currentPlayer = tempCompPlayer;
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        
+        // v is initially the minimum possible value
+        int v = MIN;
+        
+        // used to signify whether an opponent Piece was taken in a move made
+        boolean pieceTaken;
+        Piece removedPiece;
+        
+        int compX, compY;
+        int compMoveSpaces;
+        int compDirection;
+    
+        // Test all moves with every Piece (up, up-right, right, right-down, etc.)
+        for (Piece p : tempCompPlayer.getPieces()) {
+            ////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
+            /* Update selectedPiece to test moves for 1 of the Pieces */
+            ////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
+            selectedPiece = p;
+            
+            // original x,y position of the selectedPiece to move
+            compX = selectedPiece.getX();
+            compY = selectedPiece.getY();
+            
+            for (int i = 0; i < numMoves; ++i) {
+                compDirection = i;
+                compMoveSpaces = checkMove(selectedPiece, compDirection, tempGameBoard);
+                // compMoveSpaces is a positive int if the move is valid
+                if (compMoveSpaces != 0) {
+                    // pieceTaken == true if a Piece was overtaken in makeMove
+                    pieceTaken = makeMove(selectedPiece, compDirection, compMoveSpaces, tempGameBoard);
+                   
+                    // Call MIN_VALUE and update v if needed
+                    v = Math.max(v, MIN_VALUE(alpha, beta, depth+1));
+                    
+                    currentPlayer = tempCompPlayer;
+                    selectedPiece = p;
+                    /* Get state back to where it was before any move was made */
+                    tempGameBoard[compX][compY] = selectedPiece;
+//                    selectedPiece.setPos(compX, compY);
+                    // Must place the Piece removed back onto the board to maintain state
+                    if (pieceTaken) {
+                        // Return the removed Piece to the board and to the Player's list
+                        removedPiece = removedPieces.remove(removedPieces.size()-1);
+                        tempGameBoard[removedPiece.getX()][removedPiece.getY()] = removedPiece;
+                        removedPiece.getPlayer().addPiece(removedPiece);
+                    }
+                    // Just move the selectedPiece back to its location before move was made to maintain state
+                    else {
+                        // No Piece was in the position moved to so return that position to null
+                        tempGameBoard[selectedPiece.getX()][selectedPiece.getY()] = null;
+                    }
+                    selectedPiece.setPos(compX, compY);
+                    
+                    // Return v if we've hit the max possible utility in this tree
+                    if (v >= beta) {
+                        return v;
+                    }
+                    // update alpha 
+                    alpha = Math.max(alpha, v);
+                }
+            }
+        }
+        
+        return v;
+    }
+    
+    // returns a utility value for the worst possible move
+    private int MIN_VALUE(int alpha, int beta, int depth) {
+        /* Terminal Test to see if either Player won */
+        // Comp Player checked first since MIN_VALUE will be called after Comp moves
         if (tempCompPlayer.allConnected()) {
             return MAX;
         }
@@ -1635,7 +1733,7 @@ public class GameWindow extends javax.swing.JFrame {
         /* Update currentPlayer to test moves for AI Player */
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        currentPlayer = compPlayer;
+        currentPlayer = tempUserPlayer;
 
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
@@ -1644,11 +1742,18 @@ public class GameWindow extends javax.swing.JFrame {
         ////////////////////////////////////////////////////////////////////////
         
         // v is initially the minimum possible value
-        int v = MIN;
+        int v = MAX;
         
+        // used to signify whether an opponent Piece was taken in a move made
+        boolean pieceTaken;
+        Piece removedPiece;
         
+        int userX, userY;
+        int userMoveSpaces;
+        int userDirection;
+    
         // Test all moves with every Piece (up, up-right, right, right-down, etc.)
-        for (Piece p : tempCompPlayer.getPieces()) {
+        for (Piece p : tempUserPlayer.getPieces()) {
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
             /* Update selectedPiece to test moves for 1 of the Pieces */
@@ -1656,18 +1761,54 @@ public class GameWindow extends javax.swing.JFrame {
             ////////////////////////////////////////////////////////////////////
             selectedPiece = p;
             
-            compX = selectedPiece.getX();
-            compY = selectedPiece.getY();
+            // original x,y position of the selectedPiece to move
+            userX = selectedPiece.getX();
+            userY = selectedPiece.getY();
             
             for (int i = 0; i < numMoves; ++i) {
-                compDirection = i;
-                compMoveSpaces = checkMove(selectedPiece, i, tempGameBoard);
-                
+                userDirection = i;
+                userMoveSpaces = checkMove(selectedPiece, userDirection, tempGameBoard);
+                // userMoveSpaces is a positive int if the move is valid
+                if (userMoveSpaces != 0) {
+                    // pieceTaken == true if a Piece was overtaken in makeMove
+                    pieceTaken = makeMove(selectedPiece, userDirection, userMoveSpaces, tempGameBoard);
+                   
+                    // Call MAX_VALUE and update v if needed
+                    v = Math.min(v, MAX_VALUE(alpha, beta, depth+1));
+                    
+                    currentPlayer = tempUserPlayer;
+                    selectedPiece = p;
+                    /* Get state back to where it was before any move was made */
+                    tempGameBoard[userX][userY] = selectedPiece;
+//                    selectedPiece.setPos(compX, compY);
+                    // Must place the Piece removed back onto the board to maintain state
+                    if (pieceTaken) {
+                        // Return the removed Piece to the board and to the Player's list
+                        removedPiece = removedPieces.remove(removedPieces.size()-1);
+                        tempGameBoard[removedPiece.getX()][removedPiece.getY()] = removedPiece;
+                        removedPiece.getPlayer().addPiece(removedPiece);
+                    }
+                    // Just move the selectedPiece back to its location before move was made to maintain state
+                    else {
+                        // No Piece was in the position moved to so return that position to null
+                        tempGameBoard[selectedPiece.getX()][selectedPiece.getY()] = null;
+                    }
+                    selectedPiece.setPos(userX, userY);
+                    
+                    // Return v if we've hit the min possible utility in this tree
+                    if (v <= alpha) {
+                        return v;
+                    }
+                    // update beta 
+                    beta = Math.min(beta, v);
+                }
             }
         }
         
-        return 1;
+        return v;
     }
+    
+    
     
     // Return the number of spaces to move if it is a valid move. Otherwise return 0.
     private int checkMove(Piece p, int direction, Piece[][] board) {
@@ -1733,7 +1874,83 @@ public class GameWindow extends javax.swing.JFrame {
         }
         
     }
-    
+      
+    // Return true if an opponent's Piece was taken over in the move. Otherwise false.
+    private boolean makeMove(Piece p, int direction, int moveSpaces, Piece[][] board) {
+        boolean takenOver = false;
+
+        // selectedPiece's x,y
+        int pX = p.getX();
+        int pY = p.getY();
+      
+        // position to move to's x,y
+        int x = pX;
+        int y = pY;
+        
+        // Get the number of spaces to be moved in the direction and update moveSpaces and validMove accordingly
+        switch(direction) {
+            case UP:
+                // Only the x-row value is changed to move up the rows
+                x -= moveSpaces;
+                break;
+                
+            case UP_RIGHT:
+                x -= moveSpaces;
+                y += moveSpaces;
+                break;
+                
+            case RIGHT:
+                // Only the y-column value is changed to move right in the columns
+                y += moveSpaces;
+                break;
+                
+            case DOWN_RIGHT:
+                x += moveSpaces;
+                y += moveSpaces;
+                break;
+                
+            case DOWN:
+                // Only the x-row value is changed to move down the rows
+                x += moveSpaces;
+                break;
+                
+            case DOWN_LEFT:
+                x += moveSpaces;
+                y -= moveSpaces;
+                break;
+                
+            case LEFT:
+                // Only the y-column value is changed to move left in the columns
+                y -= moveSpaces;
+                break;
+                
+            case UP_LEFT:
+                x -= moveSpaces;
+                y -= moveSpaces;
+                break;
+                
+            default:
+                return false;
+        }
+        
+
+        // the move will overtake an enemy's Piece
+        if ((board[x][y] != null) && (board[x][y].getPlayer() != currentPlayer)) {
+            // Remove the Piece overtaken from the enemy Player's Pieces' list
+            removedPieces.add(board[x][y]);
+            gameBoard[x][y].getPlayer().removePiece(gameBoard[x][y]);
+            takenOver = true;
+        }
+        
+        // Move the Piece on the board
+        gameBoard[x][y] = selectedPiece;
+        gameBoard[selectedPiece.getX()][selectedPiece.getY()] = null;
+        
+        // Update the Piece's position
+        selectedPiece.setPos(x, y);     
+        
+        return takenOver;
+    }  
 
     
     /**
