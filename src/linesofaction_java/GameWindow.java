@@ -5,7 +5,7 @@
  */
 package linesofaction_java;
 
-//import javax.swing.*;
+import java.util.*;
         
 /**
  *
@@ -47,7 +47,19 @@ public class GameWindow extends javax.swing.JFrame {
     private final int COLUMN = 2;
     private final int LR_DIAG = 3;
     private final int RL_DIAG = 4;    
+    
+    /* ALPHA-BETA SEARCH ALGORITHM variables */
+    // Temporary Players used to check new states of the game
+    Player tempCompPlayer;
+    Player tempUserPlayer;
+    // Utility values for Alpha-Beta Search Algorithm
+    private final int MAX = 100;
+    private final int MIN = -100;
+    private final int DRAW = 0;
+    
     // END OF OBJECT VARIABLES
+    
+    
     
     /**
      * Creates new form GameWindow
@@ -81,8 +93,6 @@ public class GameWindow extends javax.swing.JFrame {
         
         // Initialize game Pieces to the board and respective Players
         setPieces();
-        
-
         
         // No Piece on the board has been selected yet
         selectedPiece = null;
@@ -162,6 +172,17 @@ public class GameWindow extends javax.swing.JFrame {
         // initialized board does not have Players yet so disable buttons
         disableButtons();
     }
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    //                                                                //
+    /*   ADD ONTO THIS FUNCTION WHENEVER  THE BOARD SIZE IS CHANGED   */
+    //                                                                //
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    
+    
+    
+    
     
     // Disable all JToggleButtons on the board
     private void disableButtons() {
@@ -1104,7 +1125,7 @@ public class GameWindow extends javax.swing.JFrame {
         }        
     }
     
-    
+    // updates Game elements when a valid move is made
     private void makeMove(int x, int y, javax.swing.JToggleButton jt) {
         // the move will overtake an enemy's Piece
         if ((board[x][y] != null) && (board[x][y].getPlayer() != currentPlayer)) {
@@ -1467,31 +1488,6 @@ public class GameWindow extends javax.swing.JFrame {
         // we know our current piece is in this diagonal
         int pieces = 1;
         
-//        int startRow, startColumn;
-//        
-//        // used to get starting diagonal position
-//        if (x < y) {
-//            startRow = 0;
-//            startColumn = y - x;
-//        }
-//        else {
-//            startRow = x - y;
-//            startColumn = 0;
-//        }
-//        
-//        // loop over the diagonal (making sure not to go past the board's border)
-//        for (int i = startRow; i < boardSize; ++i) {
-//            if (startColumn >= boardSize) {
-//                break;
-//            }
-//            
-//            if (board[i][startColumn] != null) {
-//                ++pieces;
-//            }
-//            
-//            ++startColumn;
-//        }
-        
         // check for Pieces up-and-left
         for (int i = x-1, j = y-1; i >= 0 && j >= 0; --i, --j) {
             if (board[i][j] != null) {
@@ -1514,30 +1510,6 @@ public class GameWindow extends javax.swing.JFrame {
         
         // we know our current piece is in this diagonal
         int pieces = 1;
-
-//        int startRow, startColumn;
-//        
-//        if ((x + y) < boardSize) {
-//            startRow = 0;
-//            startColumn = x + y;
-//        }
-//        else {
-//            startRow = (x + y) - boardSize + 1;
-//            startColumn = boardSize - 1;
-//        }
-//        
-//        // loop over the diagonal (making sure not to go past the board's border)
-//        for (int i = startRow; i < boardSize; ++i) {
-//            if (startColumn < 0) {
-//                break;
-//            }
-//            
-//            if (board[i][startColumn] != null) {
-//                ++pieces;
-//            }
-//            
-//            --startColumn;
-//        }
 
         // check for Pieces up-and-right
         for (int i = x-1, j = y+1; i >= 0 && j < boardSize; --i, ++j) {
@@ -1598,7 +1570,51 @@ public class GameWindow extends javax.swing.JFrame {
         }
     }
     
+ 
+    /*
+    Computer Player wins with utility of +100 (MAX)
+    User Player wins with utility of -100 (MIN)
+    Draw is utility of 0
+    */
     
+    private int[] ALPHA_BETA_SEARCH() {
+        // the returned action will be the new x,y position for selectedPiece to move to
+        int movePos[] = new int[2];
+        
+        /*
+        Create temp Players with Piece lists identical to the current state
+        to test for MIN & MAX values without. This is done as to not change
+        the actual state of the board until a move has been decided upon.
+        */
+        tempCompPlayer = new Player(compPlayer);
+        tempUserPlayer = new Player(userPlayer);
+        
+        
+        
+        return movePos;
+    }
+    
+    private int MAX_VALUE() {
+        // Terminal Test to see if either Player won
+        if (compPlayer.allConnected()) {
+            return MAX;
+        }
+        else if (userPlayer.allConnected()) {
+            return MIN;
+        }
+        
+        /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
+        
+        double v = Double.NEGATIVE_INFINITY;
+        
+        for (Piece p : compPlayer.getPieces()) {
+            
+        }
+    }
+    
+    
+    
+
     
     /**
      * @param args the command line arguments

@@ -35,6 +35,11 @@ public class Player {
     // Copy Constructor
     Player(Player rhs) {
         this(rhs.getValue());
+        
+        // Copy over some Pieces
+        for (Piece p : rhs.pList) {
+            this.pList.add(new Piece(p, this));
+        }
     }
     
     public int getValue() {
@@ -52,6 +57,10 @@ public class Player {
         }
         
         return s;
+    }
+    
+    public List<Piece> getPieces() {
+        return pList;
     }
     
     // Removes the passed in Piece from pList and decrements numPieces

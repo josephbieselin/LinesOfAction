@@ -26,9 +26,9 @@ public class Piece implements Comparable<Piece>{
     }
     
     // Copy Constructor
-    public Piece(Piece rhs) {
+    public Piece(Piece rhs, Player p) {
 //        this(rhs.getX(), rhs.getY(), new Player(rhs.getPlayer()));
-        this(rhs.getX(), rhs.getY(), rhs.getPlayer());
+        this(rhs.getX(), rhs.getY(), p);
     }
     
     public int getX() {
