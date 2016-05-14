@@ -58,6 +58,8 @@ public class GameWindow extends javax.swing.JFrame {
     private final int MAX = 100;
     private final int MIN = -100;
     private final int DRAW = 0;
+    // Seen states in the search to not recurse over
+    private Map<Integer, List<String>> seenStates;
     
 //    // Stores the values for which move should be made at end of Alpha-Beta Algorithm
 //    int compX, compY;
@@ -213,6 +215,8 @@ public class GameWindow extends javax.swing.JFrame {
                 buttons[i][j].setEnabled(false);
             }
         }
+        
+        END_TURN_BUTTON.setEnabled(false);
     }
     
     // Enable all JToggleButtons on the board
@@ -222,6 +226,8 @@ public class GameWindow extends javax.swing.JFrame {
                 buttons[i][j].setEnabled(true);
             }
         }
+        
+        END_TURN_BUTTON.setEnabled(true);
     }    
     
     /**
@@ -274,6 +280,7 @@ public class GameWindow extends javax.swing.JFrame {
         BOARD_0_0 = new javax.swing.JToggleButton();
         BOARD_1_0 = new javax.swing.JToggleButton();
         BOARD_1_4 = new javax.swing.JToggleButton();
+        END_TURN_BUTTON = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -507,6 +514,13 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
+        END_TURN_BUTTON.setText("End Turn");
+        END_TURN_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                END_TURN_BUTTONMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -586,12 +600,18 @@ public class GameWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(131, 131, 131)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(RESET_BUTTON)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(O_BUTTON)
-                        .addComponent(X_BUTTON)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(O_BUTTON)
+                                .addComponent(X_BUTTON)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(RESET_BUTTON)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(END_TURN_BUTTON)
+                        .addGap(79, 79, 79))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -601,7 +621,9 @@ public class GameWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(O_BUTTON)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(RESET_BUTTON)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(RESET_BUTTON)
+                    .addComponent(END_TURN_BUTTON))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 22, 22)
@@ -1066,6 +1088,20 @@ public class GameWindow extends javax.swing.JFrame {
         performClick(posX, posY, jt);
     }//GEN-LAST:event_BOARD_1_4MouseClicked
 
+    private void END_TURN_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_END_TURN_BUTTONMouseClicked
+        // TODO add your handling code here:
+        
+        // Do nothing if this button is not enabled
+        if (!END_TURN_BUTTON.isEnabled()) {
+            return;
+
+        }
+        // If it is compPlayer's turn, perform its move
+        if (currentPlayer == compPlayer) {
+            compPlay();
+        }
+    }//GEN-LAST:event_END_TURN_BUTTONMouseClicked
+
     
     /* Takes the x, y position clicked on the board and the reference to the board's JToggleButton.
     Checks to see there was already a Piece selected:
@@ -1080,11 +1116,18 @@ public class GameWindow extends javax.swing.JFrame {
     private void performClick(int x, int y, javax.swing.JToggleButton jt) {
         // Do nothing if neither user nor computer Players have been set
         if (userPlayer == null || compPlayer == null) {
+            jt.setSelected(false);
             return;
         }
         
-        // Do nothing if hte user clicked something while it is the computer's turn
+        // Do nothing if t user clicked something while it is the computer's turn
         if (currentPlayer.getValue() == compPlayer.getValue()) {
+            jt.setSelected(false);
+            return;
+        }
+        
+        // Do nothing if the game is already over
+        if (gameOver) {
             jt.setSelected(false);
             return;
         }
@@ -1144,6 +1187,8 @@ public class GameWindow extends javax.swing.JFrame {
                     }
                     
                     changeTurn();
+                    
+                    END_TURN_BUTTON.setEnabled(true);
                 }
                 // move is not valid so do not select new position
                 else {
@@ -1654,15 +1699,17 @@ public class GameWindow extends javax.swing.JFrame {
         // Create the removedPieces List to store Pieces overtaken in MIN/MAX calls
         removedPieces = new ArrayList<>(boardSize * 2);
         
-        int v = MAX_VALUE(state, MIN, MAX, 0);
+        // Create the seenStates Map
+        seenStates = new HashMap<>();
+        
+        int v = MAX_VALUE(state, seenStates, MIN, MAX, 0);
         
         // return the Piece and its corresponding direction to move with max utility
         return state.get(v);
     }
 
-    
     // returns a utility value for the best possible move
-    private int MAX_VALUE(Map<Integer, PieceAndDir> state, int alpha, int beta, int depth) {
+    private int MAX_VALUE(Map<Integer, PieceAndDir> state, Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
         /* Terminal Test to see if either Player won */
         // User Player checked first since MAX_VALUE will be called after User moves
         if (tempUserPlayer.allConnected()) {
@@ -1695,6 +1742,8 @@ public class GameWindow extends javax.swing.JFrame {
         int compX, compY;
         int compMoveSpaces;
         int compDirection;
+        
+        boolean repeatedState;
     
         // Test all moves with every Piece (up, up-right, right, right-down, etc.)
         for (Piece p : tempCompPlayer.getPieces()) {
@@ -1717,8 +1766,14 @@ public class GameWindow extends javax.swing.JFrame {
                     // pieceTaken == true if a Piece was overtaken in makeMove
                     pieceTaken = makeMove(selectedPiece, compDirection, compMoveSpaces, tempGameBoard);
                    
+                    
+                    
+                    repeatedState = checkState(tempGameBoard, seen, "MAX");
+                    
+                    
+                    
                     // Call MIN_VALUE and update v if needed
-                    v = Math.max(v, MIN_VALUE(alpha, beta, depth+1));
+                    v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
                     
                     currentPlayer = tempCompPlayer;
                     selectedPiece = p;
@@ -1757,12 +1812,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
     // returns a utility value for the best possible move
-    private int MAX_VALUE(int alpha, int beta, int depth) {
-        
-        System.out.println(depth);
-        
-        
-        
+    private int MAX_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
         /* Terminal Test to see if either Player won */
         // User Player checked first since MAX_VALUE will be called after User moves
         if (tempUserPlayer.allConnected()) {
@@ -1818,7 +1868,7 @@ public class GameWindow extends javax.swing.JFrame {
                     pieceTaken = makeMove(selectedPiece, compDirection, compMoveSpaces, tempGameBoard);
                    
                     // Call MIN_VALUE and update v if needed
-                    v = Math.max(v, MIN_VALUE(alpha, beta, depth+1));
+                    v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
                     
                     currentPlayer = tempCompPlayer;
                     selectedPiece = p;
@@ -1853,7 +1903,7 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
     // returns a utility value for the worst possible move
-    private int MIN_VALUE(int alpha, int beta, int depth) {
+    private int MIN_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
         /* Terminal Test to see if either Player won */
         // Comp Player checked first since MIN_VALUE will be called after Comp moves
         if (tempCompPlayer.allConnected()) {
@@ -1909,7 +1959,7 @@ public class GameWindow extends javax.swing.JFrame {
                     pieceTaken = makeMove(selectedPiece, userDirection, userMoveSpaces, tempGameBoard);
                    
                     // Call MAX_VALUE and update v if needed
-                    v = Math.min(v, MAX_VALUE(alpha, beta, depth+1));
+                    v = Math.min(v, MAX_VALUE(seen, alpha, beta, depth+1));
                     
                     currentPlayer = tempUserPlayer;
                     selectedPiece = p;
@@ -1942,6 +1992,51 @@ public class GameWindow extends javax.swing.JFrame {
         
         return v;
     }
+    
+    
+    /*
+    Returns true if the board's state has already been seen. Otherwise false.
+    If the state was not already in seen, it adds it to the seen states.
+    */
+    private boolean checkState(Piece[][] board, Map<Integer, List<String>> seen, String MINMAX) {
+        int hashVal = 0;
+        
+        // MINMAX contains "MIN" or "MAX" depending on which of those 2 functions called this function
+        String s = MINMAX;
+        
+        Piece p;
+        
+        for (int i = 0; i < boardSize; ++i) {
+            for (int j = 0; j < boardSize; ++j) {
+                p = board[i][j];
+                if (p == null) {
+                    hashVal += (i*10)+(j*100)*1000;
+                    s += "0";
+                }
+                else {
+                    hashVal += (i*10)+(j*100)*p.getPlayerValue();
+                    s += p.getPlayerLetter();
+                }
+            }
+        }
+        
+        // if the hashVal has not been seen before, create a new entry with this string and return false
+        if (seen.get(hashVal) == null) {
+            List<String> temp = new ArrayList<>();
+            temp.add(s);
+            seen.put(hashVal, temp);
+            return false;
+        }
+        // If the current state has not been seen, add the string to the list and return false
+        else if (!seen.get(hashVal).contains(s)) {
+            seen.get(hashVal).add(s);
+            return false;
+        }
+        // The current state has been seen, so return true
+        else {
+            return true;
+        }
+    }                    
     
     // Return the number of spaces to move if it is a valid move. Otherwise return 0.
     private int checkMove(Piece p, int direction, Piece[][] board) {
@@ -2153,14 +2248,14 @@ public class GameWindow extends javax.swing.JFrame {
         makeMove(x, y, buttons[x][y]);
     }
     
-    // Runs the game after user chooses to be Black (x) or White(o) Player
-    private void playGame() {
+    // compPlayer takes its turn
+    private void compPlay() {
         // Used for Alpha-Beta Search
         Map<Integer, PieceAndDir> state;
         PieceAndDir pieceToMove;
         
         // Play the game until it is over
-        while (!gameOver) {
+        if (!gameOver) {
             if (currentPlayer == compPlayer) {
                 // disable the buttons when it is the computer's turn
                 disableButtons();
@@ -2195,9 +2290,11 @@ public class GameWindow extends javax.swing.JFrame {
         // Display the winner
         if (winner == userPlayer) {
             DISPLAY_WINNER_TEXT_FIELD.setText("User Wins!");
+            disableButtons();
         }
         else if (winner == compPlayer) {
             DISPLAY_WINNER_TEXT_FIELD.setText("Computer Wins!");
+            disableButtons();
         }
     }
 
@@ -2237,6 +2334,7 @@ public class GameWindow extends javax.swing.JFrame {
                 // Create and display the Game
                 GameWindow gw = new GameWindow();
                 gw.setVisible(true);
+//                gw.playGame();
             }
         });
         
@@ -2272,6 +2370,7 @@ public class GameWindow extends javax.swing.JFrame {
     private javax.swing.JToggleButton BOARD_4_3;
     private javax.swing.JToggleButton BOARD_4_4;
     private javax.swing.JTextField DISPLAY_WINNER_TEXT_FIELD;
+    private javax.swing.JButton END_TURN_BUTTON;
     private javax.swing.JTextField MAX_DEPTH_GAME_TREE_REACHED_TEXT;
     private javax.swing.JTextField MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD;
     private javax.swing.JButton O_BUTTON;

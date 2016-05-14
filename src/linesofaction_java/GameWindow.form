@@ -113,14 +113,23 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="131" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="DISPLAY_WINNER_TEXT_FIELD" min="-2" max="-2" attributes="0"/>
-                  <Component id="RESET_BUTTON" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="O_BUTTON" min="-2" max="-2" attributes="0"/>
-                      <Component id="X_BUTTON" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="DISPLAY_WINNER_TEXT_FIELD" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="O_BUTTON" min="-2" max="-2" attributes="0"/>
+                              <Component id="X_BUTTON" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="RESET_BUTTON" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="END_TURN_BUTTON" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="79" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -132,7 +141,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="O_BUTTON" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="RESET_BUTTON" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="RESET_BUTTON" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="END_TURN_BUTTON" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="DISPLAY_WINNER_TEXT_FIELD" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
@@ -458,6 +470,14 @@
     <Component class="javax.swing.JToggleButton" name="BOARD_1_4">
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="BOARD_1_4MouseClicked"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="END_TURN_BUTTON">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="End Turn"/>
+      </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="END_TURN_BUTTONMouseClicked"/>
       </Events>
     </Component>
   </SubComponents>

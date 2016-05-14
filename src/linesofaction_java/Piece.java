@@ -60,6 +60,10 @@ public class Piece implements Comparable<Piece>{
         return p.getValue();
     }
     
+    public String getPlayerLetter() {
+        return p.getPlayerLetter();
+    }
+    
     // Return true if the two Pieces are adjacent to each other
     public boolean adjacent(Piece rhs) {
         if ( (x != rhs.x) && (x+1 != rhs.x) && (x-1 != rhs.x) ) {

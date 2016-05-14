@@ -90,7 +90,7 @@ public class Player {
         connected.add(pList.get(0));
         
         // remaining contains all the other pieces that must be checked
-        for (int i = 1; i < numPieces; ++i) {
+        for (int i = 1; i < pList.size()-1; ++i) {
             remaining.add(pList.get(i));
         }
         
