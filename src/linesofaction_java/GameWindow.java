@@ -71,7 +71,7 @@ public class GameWindow extends javax.swing.JFrame {
     private final int LEFT          = 6;
     private final int UP_LEFT       = 7;
     // Max depth and time to traverse in Alpha-Beta Search
-    private final int MAX_DEPTH = 4000;
+    private final int MAX_DEPTH = 2000;
     private final long MAX_TIME = 10; // 10 seconds
     private long startTime;
     // List that stores Pieces overtaken in MIN/MAX calls
@@ -2052,7 +2052,7 @@ public class GameWindow extends javax.swing.JFrame {
         If compP has more Pieces than userP left, that is bad for compP's utility.
         The less Pieces a Player has left, the closer they are to connecting them all.
         */
-        util -= (compP.getNumPieces() - userP.getNumPieces()) * 8;
+        util -= (compP.getNumPieces() - userP.getNumPieces()) * 10;
         
         
         Piece p;
@@ -2127,7 +2127,7 @@ public class GameWindow extends javax.swing.JFrame {
         If compP has more disconnected Pieces than userP , that is bad for compP's utility.
         The more disconnected a Player's Pieces are, the farther they are to connecting them all.
         */
-        util -= (compConnectedParts.size() - userConnectedParts.size()) * 2;  
+        util -= (compConnectedParts.size() - userConnectedParts.size()) * 3;  
         
         
         float xDistanceFromCenter = 0;
