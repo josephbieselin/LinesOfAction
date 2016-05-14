@@ -1,4 +1,33 @@
 /*
+Name:       Joseph Bieselin
+Project:    Lines of Action (5x5 Board)
+File Name:  GameWindow.java
+
+Course:     CS-GY 6613: Artifical Intelligence
+
+Description:
+    - Class with the public static main method for GUI instantiation
+    - Will be called to begin running the GUI to play the game
+    - Contains 2 Player objects: User and Computer (AI)
+    - User selects if they want to go first (x shapes) or second (o shapes)
+    - When it is the User's turn, they are only allowed to move their associated
+      Pieces on the game board
+    - When the User makes a valid move, they must press the "End Turn" button to
+      allow the Computer (AI) to determine its move
+    - If the User chooses to go second at the start, the User must also press
+      the "End Turn" button to allow the Computer (AI) to begin functioning
+    - Stats about the AI's call to the Alpha-Beta Search Algorithm are displayed
+      on the screen after the Computer finishes its turn
+    - When one of the Players wins, a corresponding Winner message is displayed
+    - The game board is made up of a 2D Array of Piece objects
+    - The AI has a maximum of 10 seconds to determine a move
+    - The max depth of the Alpha-Beta Search tree has been set to 2000 as to
+      ensure no stack overflow occurs on recurrence calls in the MAX_VALUE and
+      MIN_VALUE function calls inside of Alpha-Beta Search
+*/
+
+
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -2015,7 +2044,7 @@ public class GameWindow extends javax.swing.JFrame {
     
     // evaluation function when Alpha-Beta is stopped prematurely
     private int EVAL(Piece[][] board, Player compP, Player userP) {
-        int util = 0;
+        float util = 0;
         
         // Computer and User Lists of Pieces
         List<Piece> compL = new ArrayList<>();
@@ -2048,18 +2077,19 @@ public class GameWindow extends javax.swing.JFrame {
         compConnectedParts.add(compConnected);
         userConnectedParts.add(userConnected);
         
+        
         /*
-        If compP has more Pieces than userP left, that is bad for compP's utility.
+        If compP has more Pieces than userP left, that is generally bad for compP's utility.
         The less Pieces a Player has left, the closer they are to connecting them all.
         */
-        util -= (compP.getNumPieces() - userP.getNumPieces()) * 10;
+        util -= (compP.getNumPieces() - userP.getNumPieces());
         
         
         Piece p;
         List<Piece> l;
         boolean contained;
         
-        // Loop over Computer's List of Pieces and get their adjacency positions to each other
+        // Loop over Computer's List of Pieces and get sets of Pieces which are all connected
         for (int i = 0; i < compL.size(); ++i) {
             contained = false;
             
@@ -2075,7 +2105,7 @@ public class GameWindow extends javax.swing.JFrame {
                         }
                     }
                 }
-            }
+            }  
 
             for (int j = 0; j < compConnectedParts.size(); ++j) {
                 l = compConnectedParts.get(j);
@@ -2091,7 +2121,7 @@ public class GameWindow extends javax.swing.JFrame {
             }
         }
         
-        // Loop over USer's List of Pieces and get their adjacency positions to each other
+        // Loop over User's List of Pieces and get sets of Pieces which are all connected
         for (int i = 0; i < userL.size(); ++i) {
             contained = false;
             
@@ -2124,10 +2154,13 @@ public class GameWindow extends javax.swing.JFrame {
         }
         
         /*
-        If compP has more disconnected Pieces than userP , that is bad for compP's utility.
-        The more disconnected a Player's Pieces are, the farther they are to connecting them all.
+        The more disconnected the Computer's Pieces are generally implies it is bad for compP's utility.
         */
-        util -= (compConnectedParts.size() - userConnectedParts.size()) * 3;  
+        util -= compConnectedParts.size() * 3;
+        /*
+        The more disconnected the User's Pieces are the better it is for compP's utility.
+        */
+        util += userConnectedParts.size() * 10;
         
         
         float xDistanceFromCenter = 0;
@@ -2142,14 +2175,14 @@ public class GameWindow extends javax.swing.JFrame {
                 xDistanceFromCenter = Math.abs((float) l.get(j).getX() - (float) boardSize/2);
                 yDistanceFromCenter = Math.abs((float) l.get(j).getY() - (float) boardSize/2);
                 calcDistanceFromCenter = xDistanceFromCenter*xDistanceFromCenter + yDistanceFromCenter*yDistanceFromCenter;
-                util -= calcDistanceFromCenter * 3;
-//                maxDistanceFromCenterPerConnected = Math.max(maxDistanceFromCenterPerConnected, calcDistanceFromCenter);
+                util -= calcDistanceFromCenter;
+                maxDistanceFromCenterPerConnected = Math.max(maxDistanceFromCenterPerConnected, calcDistanceFromCenter);
             }
             /*
             If compP has Pieces far from the center, that is bad for its utility.
             That means it is less likely that moves will bring Pieces close together.
             */
-//            util -= maxDistanceFromCenterPerConnected;
+            util -= maxDistanceFromCenterPerConnected;
         }
         for (int i = 0; i < userConnectedParts.size(); ++i) {
             l = userConnectedParts.get(i);
@@ -2157,24 +2190,97 @@ public class GameWindow extends javax.swing.JFrame {
                 xDistanceFromCenter = Math.abs((float) l.get(j).getX() - (float) boardSize/2);
                 yDistanceFromCenter = Math.abs((float) l.get(j).getY() - (float) boardSize/2);
                 calcDistanceFromCenter = xDistanceFromCenter*xDistanceFromCenter + yDistanceFromCenter*yDistanceFromCenter;
-                util += calcDistanceFromCenter * 3;
-//                maxDistanceFromCenterPerConnected = Math.max(maxDistanceFromCenterPerConnected, calcDistanceFromCenter);
+                util += calcDistanceFromCenter;
+                maxDistanceFromCenterPerConnected = Math.max(maxDistanceFromCenterPerConnected, calcDistanceFromCenter);
             }
             /*
             If userP has Pieces far from the center, that is good for compP's utility calculations.
             That means it is less likely that moves will bring userP's Pieces close together.
             */
-//            util += maxDistanceFromCenterPerConnected;
-        }        
+            util += maxDistanceFromCenterPerConnected;
+        }
         
+        
+        float avgPosX, avgPosY;
+        float tempAvgPosX, tempAvgPosY;
+        
+        float avgPosXs[] = new float[compConnectedParts.size()];
+        float avgPosYs[] = new float[compConnectedParts.size()];
+        
+        // Computer mean positions of disjoint connected parts
+        for (int i = 0; i < compConnectedParts.size(); ++i) {
+            l = compConnectedParts.get(i);
+            avgPosX = (float) l.get(0).getX();
+            avgPosY = (float) l.get(0).getY();
+            for (int j = 0; j < l.size() - 1; ++j) {
+                tempAvgPosX = (float) l.get(j).getX() + (float) l.get(j+1).getX()/2;
+                tempAvgPosY = (float) l.get(j).getY() + (float) l.get(j+1).getY()/2;
+                avgPosX = (avgPosX + tempAvgPosX) / 2;
+            }
+            avgPosXs[i] = avgPosX;
+            avgPosYs[i] = avgPosY;
+        }
+
+        for (int i = 0; i < avgPosXs.length; ++i) {
+            for (int j = 0; j < avgPosXs.length; ++j) {
+                if (i != j) {
+                    // Distance between 2 points formula used
+                    util += distance(avgPosXs[i], avgPosXs[j], avgPosYs[i], avgPosYs[j]);
+                    /*
+                    If the mean position of disjointed connected Lists for compP are far
+                    apart, that is generally bad for the AI.
+                    */
+                }
+            }
+        }
+        
+        
+        avgPosXs = new float[userConnectedParts.size()];
+        avgPosYs = new float[userConnectedParts.size()];
+        
+        // User mean positions of disjoint connected parts
+        for (int i = 0; i < userConnectedParts.size(); ++i) {
+            l = userConnectedParts.get(i);
+            avgPosX = (float) l.get(0).getX();
+            avgPosY = (float) l.get(0).getY();
+            for (int j = 0; j < l.size() - 1; ++j) {
+                tempAvgPosX = (float) l.get(j).getX() + (float) l.get(j+1).getX()/2;
+                tempAvgPosY = (float) l.get(j).getY() + (float) l.get(j+1).getY()/2;
+                avgPosX = (avgPosX + tempAvgPosX) / 2;
+            }
+            avgPosXs[i] = avgPosX;
+            avgPosYs[i] = avgPosY;
+        }
+
+        for (int i = 0; i < avgPosXs.length; ++i) {
+            for (int j = 0; j < avgPosXs.length; ++j) {
+                if (i != j) {
+                    // Distance between 2 points formula used
+                    util += distance(avgPosXs[i], avgPosXs[j], avgPosYs[i], avgPosYs[j]);
+                    /*
+                    If the mean position of disjointed connected Lists for userP are far
+                    apart, that is generally good for the AI.
+                    */
+                }
+            }
+        }
+            
+        
+        
+        // Assure that util is not beyond the bounds of MIN/MAX
         if (util >= MAX) {
-            util = MAX - 5;
+            util = MAX - 1;
         }
         else if (util <= MIN) {
-            util = MIN + 5;
+            util = MIN + 1;
         }
         
-        return util;
+        return (int) util;
+    }
+    
+    // Distance between 2 points is returned
+    private float distance(float x1, float x2, float y1, float y2) {
+        return (float) Math.sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
     }
     
     /*

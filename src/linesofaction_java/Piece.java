@@ -1,4 +1,23 @@
 /*
+Name:       Joseph Bieselin
+Project:    Lines of Action (5x5 Board)
+File Name:  Piece.java
+
+Course:     CS-GY 6613: Artifical Intelligence
+
+Description:
+    - Contains x,y positions
+    - Contains a reference to an associated Player object
+    - Contains a boolean "removed" to determine if the current Piece instance
+      is currently on the game board as a valid Piece to interact with
+    - A default and copy constructor have been defined
+    - Associated getters and setters have been defined
+    - The "adjacent" function is used to determine if two Piece instances are
+      connected to each on the board
+*/
+
+
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.

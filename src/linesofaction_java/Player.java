@@ -1,4 +1,26 @@
 /*
+Name:       Joseph Bieselin
+Project:    Lines of Action (5x5 Board)
+File Name:  Player.java
+
+Course:     CS-GY 6613: Artifical Intelligence
+
+Description:
+    - Player object used to create a User and Computer Player in GameWindow.java
+    - Every Player has an associated game shape that represent their Pieces on
+      on the game board
+    - Every Player starts out with a set number of positive Pieces on the board
+    - A default and copy constructor have been defined
+    - Associated getters and setters have been defined
+    - adding and removing of Pieces from the Player's List of Pieces have been
+      defined using the addPiece and removePiece functions
+    - The "allConnected" function determines whether or not all the Pieces in a
+      Player's List of Pieces are all adjacent to at least one other Piece in
+      the List AND that they form a chain with no breaks in adjacent Pieces
+*/
+
+
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
