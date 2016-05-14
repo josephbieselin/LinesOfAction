@@ -77,6 +77,14 @@ public class GameWindow extends javax.swing.JFrame {
     // List that stores Pieces overtaken in MIN/MAX calls
     private List<Piece> removedPieces;
     
+    // Values to show in Alpha-Beta Search call
+    private long depth;
+    private long nodesGenerated;
+    private long evalCalledMax;
+    private long evalCalledMin;
+    private long pruningMax;
+    private long pruningMin;
+    
     // END OF OBJECT VARIABLES
     
     
@@ -237,20 +245,12 @@ public class GameWindow extends javax.swing.JFrame {
 
         X_BUTTON = new javax.swing.JButton();
         O_BUTTON = new javax.swing.JButton();
-        RESET_BUTTON = new javax.swing.JButton();
-        DISPLAY_WINNER_TEXT_FIELD = new javax.swing.JTextField();
         MAX_DEPTH_GAME_TREE_REACHED_TEXT = new javax.swing.JTextField();
-        MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD = new javax.swing.JTextField();
         TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT = new javax.swing.JTextField();
-        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD = new javax.swing.JTextField();
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT = new javax.swing.JTextField();
-        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD = new javax.swing.JTextField();
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT = new javax.swing.JTextField();
-        TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD = new javax.swing.JTextField();
         TIMES_PRUNING_OCCURRED_IN_MAX_TEXT = new javax.swing.JTextField();
-        TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD = new javax.swing.JTextField();
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT = new javax.swing.JTextField();
-        TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD = new javax.swing.JTextField();
         BOARD_0_1 = new javax.swing.JToggleButton();
         BOARD_0_2 = new javax.swing.JToggleButton();
         BOARD_0_3 = new javax.swing.JToggleButton();
@@ -277,6 +277,13 @@ public class GameWindow extends javax.swing.JFrame {
         BOARD_1_0 = new javax.swing.JToggleButton();
         BOARD_1_4 = new javax.swing.JToggleButton();
         END_TURN_BUTTON = new javax.swing.JButton();
+        DISPLAY_WINNER_TEXT_FIELD = new javax.swing.JLabel();
+        MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD = new javax.swing.JLabel();
+        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD = new javax.swing.JLabel();
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD = new javax.swing.JLabel();
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD = new javax.swing.JLabel();
+        TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD = new javax.swing.JLabel();
+        TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -300,20 +307,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
-        RESET_BUTTON.setText("RESET");
-        RESET_BUTTON.setEnabled(false);
-        RESET_BUTTON.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                RESET_BUTTONMouseClicked(evt);
-            }
-        });
-
-        DISPLAY_WINNER_TEXT_FIELD.setEnabled(false);
-
         MAX_DEPTH_GAME_TREE_REACHED_TEXT.setText("Max Depth of Game Tree Reached");
         MAX_DEPTH_GAME_TREE_REACHED_TEXT.setEnabled(false);
-
-        MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD.setEnabled(false);
 
         TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT.setText("Total # of Nodes Generated in Tree");
         TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT.setEnabled(false);
@@ -323,27 +318,11 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
-        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD.setEnabled(false);
-        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELDActionPerformed(evt);
-            }
-        });
-
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT.setText("# of Times Evalution Function called in MAX-VALUE");
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT.setEnabled(false);
 
-        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD.setEnabled(false);
-        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed(evt);
-            }
-        });
-
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT.setText("# of Times Evalution Function called in MIN-VALUE");
         TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT.setEnabled(false);
-
-        TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD.setEnabled(false);
 
         TIMES_PRUNING_OCCURRED_IN_MAX_TEXT.setText("# of Times Pruning Occurred in MAX-VALUE");
         TIMES_PRUNING_OCCURRED_IN_MAX_TEXT.setEnabled(false);
@@ -353,12 +332,8 @@ public class GameWindow extends javax.swing.JFrame {
             }
         });
 
-        TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD.setEnabled(false);
-
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT.setText("# of Times Pruning Occurred in MIN-VALUE");
         TIMES_PRUNING_OCCURRED_IN_MIN_TEXT.setEnabled(false);
-
-        TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD.setEnabled(false);
 
         BOARD_0_1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -522,92 +497,111 @@ public class GameWindow extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_1_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_0_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(BOARD_0_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(BOARD_1_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(BOARD_0_3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addGap(131, 131, 131)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(O_BUTTON)
-                                .addComponent(X_BUTTON)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(RESET_BUTTON)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(END_TURN_BUTTON)
-                        .addGap(79, 79, 79))))
+                        .addGap(79, 79, 79))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(O_BUTTON)
+                            .addComponent(X_BUTTON))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(139, 139, 139)
+                                .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(133, 133, 133)
+                                .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(123, 123, 123)
+                                .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(133, 133, 133)
+                                .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(BOARD_1_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(BOARD_1_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(BOARD_0_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(BOARD_0_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(BOARD_1_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(BOARD_0_3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(BOARD_0_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(BOARD_1_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BOARD_2_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_2_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BOARD_3_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_3_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(131, 131, 131)
+                        .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(87, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(136, 136, 136)
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(147, 147, 147)
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -617,12 +611,10 @@ public class GameWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(O_BUTTON)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(RESET_BUTTON)
-                    .addComponent(END_TURN_BUTTON))
+                .addComponent(END_TURN_BUTTON)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22)
+                .addComponent(DISPLAY_WINNER_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -658,36 +650,37 @@ public class GameWindow extends javax.swing.JFrame {
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(12, 12, 12)
                                         .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(6, 6, 6))
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(BOARD_4_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(BOARD_4_1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(BOARD_4_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(BOARD_4_3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addComponent(BOARD_4_4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addComponent(BOARD_1_2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
                         .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(32, 32, 32))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(BOARD_0_0, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -739,25 +732,13 @@ public class GameWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_X_BUTTONMouseClicked
 
-    private void RESET_BUTTONMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RESET_BUTTONMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_RESET_BUTTONMouseClicked
-
     private void TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXTActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXTActionPerformed
 
-    private void TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELDActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELDActionPerformed
-
     private void TIMES_PRUNING_OCCURRED_IN_MAX_TEXTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TIMES_PRUNING_OCCURRED_IN_MAX_TEXTActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TIMES_PRUNING_OCCURRED_IN_MAX_TEXTActionPerformed
-
-    private void TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELDActionPerformed
 
     private void BOARD_0_1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BOARD_0_1MouseClicked
         // TODO add your handling code here:
@@ -1675,6 +1656,17 @@ public class GameWindow extends javax.swing.JFrame {
     Draw is utility of 0
     */
     private PieceAndDir ALPHA_BETA_SEARCH(Map<Integer, PieceAndDir> state) {
+        
+        // all values to show start at 0
+        depth = 0;
+        nodesGenerated = 0;
+        evalCalledMax = 0;
+        evalCalledMin = 0;
+        pruningMax = 0;
+        pruningMin = 0;        
+        
+        
+        
         /*
         Create temp Players with Piece lists identical to the current state
         to test for MIN & MAX values without. This is done as to not change
@@ -2426,8 +2418,6 @@ public class GameWindow extends javax.swing.JFrame {
                 state = new HashMap<>();
                 pieceToMove = ALPHA_BETA_SEARCH(state);
                 
-                System.out.println("HERE:\n" + pieceToMove.p.getX() + "\n");
-                
                 // Update our selectedPiece and make the move the AI chose
                 selectedPiece = gameBoard[pieceToMove.p.getX()][pieceToMove.p.getY()];
                 makeMove(selectedPiece, pieceToMove.dir, gameBoard);
@@ -2448,16 +2438,18 @@ public class GameWindow extends javax.swing.JFrame {
                 enableButtons();
                 
                 // change the turn back to userPlayer
-                changeTurn();
+                currentPlayer = userPlayer;
             }
         }
         
         // Display the winner
         if (winner == userPlayer) {
+            DISPLAY_WINNER_TEXT_FIELD.setEnabled(true);
             DISPLAY_WINNER_TEXT_FIELD.setText("User Wins!");
             disableButtons();
         }
         else if (winner == compPlayer) {
+            DISPLAY_WINNER_TEXT_FIELD.setEnabled(true);
             DISPLAY_WINNER_TEXT_FIELD.setText("Computer Wins!");
             disableButtons();
         }
@@ -2534,22 +2526,21 @@ public class GameWindow extends javax.swing.JFrame {
     private javax.swing.JToggleButton BOARD_4_2;
     private javax.swing.JToggleButton BOARD_4_3;
     private javax.swing.JToggleButton BOARD_4_4;
-    private javax.swing.JTextField DISPLAY_WINNER_TEXT_FIELD;
+    private javax.swing.JLabel DISPLAY_WINNER_TEXT_FIELD;
     private javax.swing.JButton END_TURN_BUTTON;
     private javax.swing.JTextField MAX_DEPTH_GAME_TREE_REACHED_TEXT;
-    private javax.swing.JTextField MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD;
+    private javax.swing.JLabel MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD;
     private javax.swing.JButton O_BUTTON;
-    private javax.swing.JButton RESET_BUTTON;
     private javax.swing.JTextField TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT;
-    private javax.swing.JTextField TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD;
+    private javax.swing.JLabel TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD;
     private javax.swing.JTextField TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT;
-    private javax.swing.JTextField TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD;
+    private javax.swing.JLabel TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD;
     private javax.swing.JTextField TIMES_PRUNING_OCCURRED_IN_MAX_TEXT;
-    private javax.swing.JTextField TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD;
+    private javax.swing.JLabel TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD;
     private javax.swing.JTextField TIMES_PRUNING_OCCURRED_IN_MIN_TEXT;
-    private javax.swing.JTextField TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD;
+    private javax.swing.JLabel TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD;
     private javax.swing.JTextField TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT;
-    private javax.swing.JTextField TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD;
+    private javax.swing.JLabel TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD;
     private javax.swing.JButton X_BUTTON;
     // End of variables declaration//GEN-END:variables
 }
