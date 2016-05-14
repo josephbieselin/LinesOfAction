@@ -71,7 +71,7 @@ public class GameWindow extends javax.swing.JFrame {
     private final int LEFT          = 6;
     private final int UP_LEFT       = 7;
     // Max depth and time to traverse in Alpha-Beta Search
-    private final int MAX_DEPTH = 3000;
+    private final int MAX_DEPTH = 4000;
     private final long MAX_TIME = 10; // 10 seconds
     private long startTime;
     // List that stores Pieces overtaken in MIN/MAX calls
@@ -1813,7 +1813,7 @@ public class GameWindow extends javax.swing.JFrame {
         }
  
         // check for cutoff conditions
-        if ((depth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
+        if ((dpth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
             // EVAL called in MAX_VALUE so inc evalCalledMax
             ++evalCalledMax;
             return EVAL(tempGameBoard, tempCompPlayer, tempUserPlayer);
@@ -1921,7 +1921,7 @@ public class GameWindow extends javax.swing.JFrame {
         }
  
         // check for cutoff conditions
-        if ((depth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
+        if ((dpth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
             // EVAL called in MIN_VALUE so inc evalCalledMin
             ++evalCalledMin;
             return EVAL(tempGameBoard, tempCompPlayer, tempUserPlayer);
@@ -2054,6 +2054,7 @@ public class GameWindow extends javax.swing.JFrame {
         */
         util -= (compP.getNumPieces() - userP.getNumPieces()) * 8;
         
+        
         Piece p;
         List<Piece> l;
         boolean contained;
@@ -2122,15 +2123,56 @@ public class GameWindow extends javax.swing.JFrame {
             }
         }
         
-        
         /*
         If compP has more disconnected Pieces than userP , that is bad for compP's utility.
         The more disconnected a Player's Pieces are, the farther they are to connecting them all.
         */
-        util -= (compConnectedParts.size() - userConnectedParts.size()) * 5;  
+        util -= (compConnectedParts.size() - userConnectedParts.size()) * 2;  
         
         
+        float xDistanceFromCenter = 0;
+        float yDistanceFromCenter = 0;
+        float calcDistanceFromCenter = 0;
+        float maxDistanceFromCenterPerConnected = 0;
         
+        // Get the Piece with the largest calculated distance from the center for computer and user
+        for (int i = 0; i < compConnectedParts.size(); ++i) {
+            l = compConnectedParts.get(i);
+            for (int j = 0; j < l.size(); ++j) {
+                xDistanceFromCenter = Math.abs((float) l.get(j).getX() - (float) boardSize/2);
+                yDistanceFromCenter = Math.abs((float) l.get(j).getY() - (float) boardSize/2);
+                calcDistanceFromCenter = xDistanceFromCenter*xDistanceFromCenter + yDistanceFromCenter*yDistanceFromCenter;
+                util -= calcDistanceFromCenter * 3;
+//                maxDistanceFromCenterPerConnected = Math.max(maxDistanceFromCenterPerConnected, calcDistanceFromCenter);
+            }
+            /*
+            If compP has Pieces far from the center, that is bad for its utility.
+            That means it is less likely that moves will bring Pieces close together.
+            */
+//            util -= maxDistanceFromCenterPerConnected;
+        }
+        for (int i = 0; i < userConnectedParts.size(); ++i) {
+            l = userConnectedParts.get(i);
+            for (int j = 0; j < l.size(); ++j) {
+                xDistanceFromCenter = Math.abs((float) l.get(j).getX() - (float) boardSize/2);
+                yDistanceFromCenter = Math.abs((float) l.get(j).getY() - (float) boardSize/2);
+                calcDistanceFromCenter = xDistanceFromCenter*xDistanceFromCenter + yDistanceFromCenter*yDistanceFromCenter;
+                util += calcDistanceFromCenter * 3;
+//                maxDistanceFromCenterPerConnected = Math.max(maxDistanceFromCenterPerConnected, calcDistanceFromCenter);
+            }
+            /*
+            If userP has Pieces far from the center, that is good for compP's utility calculations.
+            That means it is less likely that moves will bring userP's Pieces close together.
+            */
+//            util += maxDistanceFromCenterPerConnected;
+        }        
+        
+        if (util >= MAX) {
+            util = MAX - 5;
+        }
+        else if (util <= MIN) {
+            util = MIN + 5;
+        }
         
         return util;
     }
@@ -2412,6 +2454,8 @@ public class GameWindow extends javax.swing.JFrame {
                 selectedPiece = gameBoard[pieceToMove.p.getX()][pieceToMove.p.getY()];
                 makeMove(selectedPiece, pieceToMove.dir, gameBoard);
                 
+                updateAlphaBetaStats();
+                
                 if (checkWin(compPlayer)) {
                     winner = compPlayer;
                     gameOver = true;
@@ -2443,6 +2487,16 @@ public class GameWindow extends javax.swing.JFrame {
             DISPLAY_WINNER_TEXT_FIELD.setText("Computer Wins!");
             disableButtons();
         }
+    }
+
+    private void updateAlphaBetaStats() {
+        MAX_DEPTH_GAME_TREE_REACHED_TEXT_FIELD.setText(Long.toString(depth));
+        TOTAL_NUMBER_NODES_GENERATED_IN_TREE_TEXT_FIELD.setText(Long.toString(nodesGenerated));
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MAX_TEXT_FIELD.setText(Long.toString(evalCalledMax));
+        TIMES_EVALUATION_FUNCTION_CALLED_IN_MIN_TEXT_FIELD.setText(Long.toString(evalCalledMin));
+        TIMES_PRUNING_OCCURRED_IN_MAX_TEXT_FIELD.setText(Long.toString(pruningMax));
+        TIMES_PRUNING_OCCURRED_IN_MIN_TEXT_FIELD.setText(Long.toString(pruningMin));
+        
     }
 
     
