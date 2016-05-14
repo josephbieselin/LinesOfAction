@@ -60,13 +60,6 @@ public class GameWindow extends javax.swing.JFrame {
     private final int DRAW = 0;
     // Seen states in the search to not recurse over
     private Map<Integer, List<String>> seenStates;
-    
-//    // Stores the values for which move should be made at end of Alpha-Beta Algorithm
-//    int compX, compY;
-//    int compMoveSpaces;
-//    int compDirection;
-    
-    
     // Variable/Codes for AI Movement
     private final int numMoves = 8; // up, right, down, left, diagonally in 4 ways
     private final int UP            = 0;
@@ -77,7 +70,10 @@ public class GameWindow extends javax.swing.JFrame {
     private final int DOWN_LEFT     = 5;
     private final int LEFT          = 6;
     private final int UP_LEFT       = 7;
-    
+    // Max depth and time to traverse in Alpha-Beta Search
+    private final int MAX_DEPTH = 3000;
+    private final long MAX_TIME = 10; // 10 seconds
+    private long startTime;
     // List that stores Pieces overtaken in MIN/MAX calls
     private List<Piece> removedPieces;
     
@@ -1690,10 +1686,14 @@ public class GameWindow extends javax.swing.JFrame {
         // Create temp board to test with
         tempGameBoard = new Piece[boardSize][boardSize];
         for (Piece p : tempCompPlayer.getPieces()) {
-            tempGameBoard[p.getX()][p.getY()] = p;
+            if (!p.isRemoved()) {
+                tempGameBoard[p.getX()][p.getY()] = p;
+            }
         }
         for (Piece p : tempUserPlayer.getPieces()) {
-            tempGameBoard[p.getX()][p.getY()] = p;
+            if (!p.isRemoved()) {
+                tempGameBoard[p.getX()][p.getY()] = p;
+            }
         }
         
         // Create the removedPieces List to store Pieces overtaken in MIN/MAX calls
@@ -1712,16 +1712,16 @@ public class GameWindow extends javax.swing.JFrame {
     private int MAX_VALUE(Map<Integer, PieceAndDir> state, Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
         /* Terminal Test to see if either Player won */
         // User Player checked first since MAX_VALUE will be called after User moves
-        if (tempUserPlayer.allConnected()) {
+        if (checkWin(tempUserPlayer)) {
             return MIN;
         }
-        else if (tempCompPlayer.allConnected()) {
+        else if (checkWin(tempCompPlayer)) {
             return MAX;
         }
  
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        /* Update currentPlayer to test moves for AI Player */
+        /* Update currentPlayer to test moves for temp AI Player */
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         currentPlayer = tempCompPlayer;
@@ -1745,8 +1745,13 @@ public class GameWindow extends javax.swing.JFrame {
         
         boolean repeatedState;
     
-        // Test all moves with every Piece (up, up-right, right, right-down, etc.)
+        // Test every Piece for currentPlayer
         for (Piece p : tempCompPlayer.getPieces()) {
+        	// If the current Piece is not actually on the board to be tested, go to the next Piece
+        	if (p.isRemoved()) {
+                    continue;
+        	}
+
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
             /* Update selectedPiece to test moves for 1 of the Pieces */
@@ -1758,28 +1763,30 @@ public class GameWindow extends javax.swing.JFrame {
             compX = selectedPiece.getX();
             compY = selectedPiece.getY();
             
+            // Test all possible movements with selectedPiece p (up, up-right, right, right-down, etc.)
             for (int i = 0; i < numMoves; ++i) {
                 compDirection = i;
+                
                 compMoveSpaces = checkMove(selectedPiece, compDirection, tempGameBoard);
                 // compMoveSpaces is a positive int if the move is valid
                 if (compMoveSpaces != 0) {
                     // pieceTaken == true if a Piece was overtaken in makeMove
                     pieceTaken = makeMove(selectedPiece, compDirection, compMoveSpaces, tempGameBoard);
                    
-                    
-                    
+                    /* Graph Search to not repeat states already seen */
                     repeatedState = checkState(tempGameBoard, seen, "MAX");
-                    
-                    
-                    
-                    // Call MIN_VALUE and update v if needed
-                    v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
-                    
-                    currentPlayer = tempCompPlayer;
-                    selectedPiece = p;
-                    
-                    // Add the current Piece and its direction to the state with utility v
-                    state.put(v, new PieceAndDir(selectedPiece, i));
+                    // State has not been seen already so call MIN_VALUE
+                    if (!repeatedState) {
+                        // Call MIN_VALUE and update v if needed
+                        v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
+                        
+                        // Reset values to current MAX_VALUE call's values
+                        currentPlayer = tempCompPlayer;
+                        selectedPiece = p;
+                        
+                        // Add the current Piece and its direction to the state with utility v
+                        state.put(v, new PieceAndDir(selectedPiece, i));
+                    }
                     
                     /* Get state back to where it was before any move was made */
                     tempGameBoard[compX][compY] = selectedPiece;
@@ -1815,13 +1822,18 @@ public class GameWindow extends javax.swing.JFrame {
     private int MAX_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
         /* Terminal Test to see if either Player won */
         // User Player checked first since MAX_VALUE will be called after User moves
-        if (tempUserPlayer.allConnected()) {
+        if (checkWin(tempUserPlayer)) {
             return MIN;
         }
-        else if (tempCompPlayer.allConnected()) {
+        else if (checkWin(tempCompPlayer)) {
             return MAX;
         }
  
+        // check for cutoff conditions
+        if ((depth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
+            return EVAL(tempGameBoard, tempCompPlayer, tempUserPlayer);
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         /* Update currentPlayer to test moves for AI Player */
@@ -1829,11 +1841,7 @@ public class GameWindow extends javax.swing.JFrame {
         ////////////////////////////////////////////////////////////////////////
         currentPlayer = tempCompPlayer;
 
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
+
         
         // v is initially the minimum possible value
         int v = MIN;
@@ -1846,8 +1854,15 @@ public class GameWindow extends javax.swing.JFrame {
         int compMoveSpaces;
         int compDirection;
     
-        // Test all moves with every Piece (up, up-right, right, right-down, etc.)
+        boolean repeatedState;
+
+        // Test every Piece for currentPlayer
         for (Piece p : tempCompPlayer.getPieces()) {
+            // If the current Piece is not actually on the board to be tested, go to the next Piece
+            if (p.isRemoved()) {
+                continue;
+            }
+            
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
             /* Update selectedPiece to test moves for 1 of the Pieces */
@@ -1859,19 +1874,28 @@ public class GameWindow extends javax.swing.JFrame {
             compX = selectedPiece.getX();
             compY = selectedPiece.getY();
             
+            // Test all possible movements with selectedPiece p (up, up-right, right, right-down, etc.)
             for (int i = 0; i < numMoves; ++i) {
                 compDirection = i;
+                
                 compMoveSpaces = checkMove(selectedPiece, compDirection, tempGameBoard);
                 // compMoveSpaces is a positive int if the move is valid
                 if (compMoveSpaces != 0) {
                     // pieceTaken == true if a Piece was overtaken in makeMove
                     pieceTaken = makeMove(selectedPiece, compDirection, compMoveSpaces, tempGameBoard);
                    
-                    // Call MIN_VALUE and update v if needed
-                    v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
+                    /* Graph Search to not repeat states already seen */
+                    repeatedState = checkState(tempGameBoard, seen, "MAX");
+                    // State has not been seen already so call MIN_VALUE
+                    if (!repeatedState) {
+                        // Call MIN_VALUE and update v if needed
+                        v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
+                        
+                        // Reset values to current MAX_VALUE call's values
+                        currentPlayer = tempCompPlayer;
+                        selectedPiece = p;
+                    }
                     
-                    currentPlayer = tempCompPlayer;
-                    selectedPiece = p;
                     /* Get state back to where it was before any move was made */
                     tempGameBoard[compX][compY] = selectedPiece;
 //                    selectedPiece.setPos(compX, compY);
@@ -1906,13 +1930,18 @@ public class GameWindow extends javax.swing.JFrame {
     private int MIN_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
         /* Terminal Test to see if either Player won */
         // Comp Player checked first since MIN_VALUE will be called after Comp moves
-        if (tempCompPlayer.allConnected()) {
+        if (checkWin(tempCompPlayer)) {
             return MAX;
         }
-        else if (tempUserPlayer.allConnected()) {
+        else if (checkWin(tempUserPlayer)) {
             return MIN;
         }
  
+        // check for cutoff conditions
+        if ((depth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
+            return EVAL(tempGameBoard, tempCompPlayer, tempUserPlayer);
+        }
+        
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         /* Update currentPlayer to test moves for AI Player */
@@ -1920,13 +1949,7 @@ public class GameWindow extends javax.swing.JFrame {
         ////////////////////////////////////////////////////////////////////////
         currentPlayer = tempUserPlayer;
 
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        
-        // v is initially the minimum possible value
+        // v is initially the maximum possible value
         int v = MAX;
         
         // used to signify whether an opponent Piece was taken in a move made
@@ -1937,8 +1960,15 @@ public class GameWindow extends javax.swing.JFrame {
         int userMoveSpaces;
         int userDirection;
     
-        // Test all moves with every Piece (up, up-right, right, right-down, etc.)
+        boolean repeatedState;
+
+        // Test every Piece for currentPlayer
         for (Piece p : tempUserPlayer.getPieces()) {
+            // If the current Piece is not actually on the board to be tested, go to the next Piece
+            if (p.isRemoved()) {
+                continue;
+            }  
+            
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
             /* Update selectedPiece to test moves for 1 of the Pieces */
@@ -1952,17 +1982,25 @@ public class GameWindow extends javax.swing.JFrame {
             
             for (int i = 0; i < numMoves; ++i) {
                 userDirection = i;
+                
                 userMoveSpaces = checkMove(selectedPiece, userDirection, tempGameBoard);
                 // userMoveSpaces is a positive int if the move is valid
                 if (userMoveSpaces != 0) {
                     // pieceTaken == true if a Piece was overtaken in makeMove
                     pieceTaken = makeMove(selectedPiece, userDirection, userMoveSpaces, tempGameBoard);
                    
-                    // Call MAX_VALUE and update v if needed
-                    v = Math.min(v, MAX_VALUE(seen, alpha, beta, depth+1));
+                    /* Graph Search to not repeat states already seen */
+                    repeatedState = checkState(tempGameBoard, seen, "MIN");
+                    // State has not been seen already so call MIN_VALUE
+                    if (!repeatedState) {
+                        // Call MAX_VALUE and update v if needed
+                        v = Math.min(v, MAX_VALUE(seen, alpha, beta, depth+1));
+                        
+                        // Reset values to current MIN_VALUE call's values
+                        currentPlayer = tempUserPlayer;
+                        selectedPiece = p;
+                    }                    
                     
-                    currentPlayer = tempUserPlayer;
-                    selectedPiece = p;
                     /* Get state back to where it was before any move was made */
                     tempGameBoard[userX][userY] = selectedPiece;
 //                    selectedPiece.setPos(compX, compY);
@@ -1993,6 +2031,127 @@ public class GameWindow extends javax.swing.JFrame {
         return v;
     }
     
+    // evaluation function when Alpha-Beta is stopped prematurely
+    private int EVAL(Piece[][] board, Player compP, Player userP) {
+        int util = 0;
+        
+        // Computer and User Lists of Pieces
+        List<Piece> compL = new ArrayList<>();
+        List<Piece> userL = new ArrayList<>();
+        
+        // Only user elements that are considered to be on the board
+        for (Piece p : compP.getPieces()) {
+            if (!p.isRemoved()) {
+                compL.add(p);
+            }
+        }
+        for (Piece p : userP.getPieces()) {
+            if (!p.isRemoved()) {
+                userL.add(p);
+            }
+        }
+        
+        // Each index will contain Lists of Pieces that are connected to each other
+        List<List<Piece>> compConnectedParts = new ArrayList<>();
+        List<List<Piece>> userConnectedParts = new ArrayList<>();
+        
+        // Lists containing connected Pieces
+        List<Piece> compConnected = new ArrayList<>();
+        List<Piece> userConnected = new ArrayList<>();
+        
+        // Put the first element of each Player's Pieces List into a connected List
+        compConnected.add(compL.remove(0));
+        userConnected.add(userL.remove(0));
+        // Add the Lists to the Lists of connected Pieces
+        compConnectedParts.add(compConnected);
+        userConnectedParts.add(userConnected);
+        
+        /*
+        If compP has more Pieces than userP left, that is bad for compP's utility.
+        The less Pieces a Player has left, the closer they are to connecting them all.
+        */
+        util -= (compP.getNumPieces() - userP.getNumPieces()) * 8;
+        
+        Piece p;
+        List<Piece> l;
+        boolean contained;
+        
+        // Loop over Computer's List of Pieces and get their adjacency positions to each other
+        for (int i = 0; i < compL.size(); ++i) {
+            contained = false;
+            
+            p = compL.get(i);
+            
+            // Check if p is adjacent to any of our current contents
+            for (int j = 0; j < compConnectedParts.size(); ++j) {
+                l = compConnectedParts.get(j);
+                for (int k = 0; k < l.size(); ++k) {
+                    if (p.adjacent(l.get(k))) {
+                        if (!l.contains(p)) {
+                            l.add(p);
+                        }
+                    }
+                }
+            }
+
+            for (int j = 0; j < compConnectedParts.size(); ++j) {
+                l = compConnectedParts.get(j);
+                if (l.contains(p)) {
+                    contained = true;
+                }
+            }
+            
+            if (!contained) {
+                compConnected = new ArrayList<>();
+                compConnected.add(p);
+                compConnectedParts.add(compConnected);            
+            }
+        }
+        
+        // Loop over USer's List of Pieces and get their adjacency positions to each other
+        for (int i = 0; i < userL.size(); ++i) {
+            contained = false;
+            
+            p = userL.get(i);
+            
+            // Check if p is adjacent to any of our current contents
+            for (int j = 0; j < userConnectedParts.size(); ++j) {
+                l = userConnectedParts.get(j);
+                for (int k = 0; k < l.size(); ++k) {
+                    if (p.adjacent(l.get(k))) {
+                        if (!l.contains(p)) {
+                            l.add(p);
+                        }
+                    }
+                }
+            }
+
+            for (int j = 0; j < userConnectedParts.size(); ++j) {
+                l = userConnectedParts.get(j);
+                if (l.contains(p)) {
+                    contained = true;
+                }
+            }
+            
+            if (!contained) {
+                userConnected = new ArrayList<>();
+                userConnected.add(p);
+                userConnectedParts.add(userConnected);            
+            }
+        }
+        
+        
+        /*
+        If compP has more disconnected Pieces than userP , that is bad for compP's utility.
+        The more disconnected a Player's Pieces are, the farther they are to connecting them all.
+        */
+        util -= (compConnectedParts.size() - userConnectedParts.size()) * 5;  
+        
+        
+        
+        
+        return util;
+    }
     
     /*
     Returns true if the board's state has already been seen. Otherwise false.
@@ -2006,6 +2165,7 @@ public class GameWindow extends javax.swing.JFrame {
         
         Piece p;
         
+        // Loop over the board to compute the hash value and create the string for the current board state
         for (int i = 0; i < boardSize; ++i) {
             for (int j = 0; j < boardSize; ++j) {
                 p = board[i][j];
@@ -2250,6 +2410,9 @@ public class GameWindow extends javax.swing.JFrame {
     
     // compPlayer takes its turn
     private void compPlay() {
+        
+        startTime = System.nanoTime();
+        
         // Used for Alpha-Beta Search
         Map<Integer, PieceAndDir> state;
         PieceAndDir pieceToMove;
@@ -2263,15 +2426,17 @@ public class GameWindow extends javax.swing.JFrame {
                 state = new HashMap<>();
                 pieceToMove = ALPHA_BETA_SEARCH(state);
                 
+                System.out.println("HERE:\n" + pieceToMove.p.getX() + "\n");
+                
                 // Update our selectedPiece and make the move the AI chose
                 selectedPiece = gameBoard[pieceToMove.p.getX()][pieceToMove.p.getY()];
                 makeMove(selectedPiece, pieceToMove.dir, gameBoard);
                 
-                if (compPlayer.allConnected()) {
+                if (checkWin(compPlayer)) {
                     winner = compPlayer;
                     gameOver = true;
                 }
-                else if (userPlayer.allConnected()) {
+                else if (checkWin(userPlayer)) {
                     winner = userPlayer;
                     gameOver = true;
                 }

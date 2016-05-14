@@ -15,7 +15,8 @@ public class Player {
     // PRIVATE
     final private int value;
     
-    private int numPieces = 6;
+    private int numPieces = 0;
+    private int startingPieces = 6;
     final private List<Piece> pList;
     
     // Used for GUI purposes
@@ -29,21 +30,32 @@ public class Player {
     // Constructor
     Player(int value) {
         this.value = value;
-        pList = new ArrayList<>(numPieces);
+        pList = new ArrayList<>(startingPieces);
+//        
+//        int i = 0;
+//        while (i < startingPieces) {
+//            addPiece(new Piece(0, i, this));
+//        }
+//        System.out.println(allConnected());
     }
     
     // Copy Constructor
     Player(Player rhs) {
         this(rhs.getValue());
-        
+
         // Copy over some Pieces
         for (Piece p : rhs.pList) {
-            this.pList.add(new Piece(p, this));
+            addPiece(new Piece(p, this));
+//            this.pList.add(new Piece(p, this));
         }
     }
     
     public int getValue() {
         return value;
+    }
+    
+    public int getNumPieces() {
+        return numPieces;
     }
     
     public String getPlayerLetter() {
@@ -65,33 +77,52 @@ public class Player {
     
     // Removes the passed in Piece from pList and decrements numPieces
     public void removePiece(Piece p) {
-        pList.remove(p);
-        --numPieces;        
+        pList.get(pList.indexOf(p)).setRemoved(true);
+        --numPieces;
     }
     
     // Called numPieces times to initialize 
     public void addPiece(Piece p) {
-        pList.add(p);
-    }
-    
-    public void addPiece(Piece p, int index) {
-        pList.add(index, p);
+        // Piece not already in list
+        if (pList.indexOf(p) == -1) {
+            pList.add(p);
+        }
+        // Piece is in list already
+        else {
+            pList.get(pList.indexOf(p)).setRemoved(false);
+        }
+        
+        ++numPieces;
     }
     
     public boolean allConnected() {
         // all pieces are connected if there's only 1 left
-        if (numPieces == 1)
+        if (numPieces <= 1)
             return true;
         
         List<Piece> connected = new ArrayList<>(numPieces);
         List<Piece> remaining = new ArrayList<>(numPieces);
         
+        Piece p;
+        
+        int i = 0;
+        while (i < pList.size()) {
+            p = pList.get(i);
+            ++i;
+            if (!p.isRemoved()) {
+                connected.add(p);
+                break;
+            }
+        }
         // connected only has 1 starting piece so far
-        connected.add(pList.get(0));
         
         // remaining contains all the other pieces that must be checked
-        for (int i = 1; i < pList.size()-1; ++i) {
-            remaining.add(pList.get(i));
+        while (i < pList.size()) {
+            p = pList.get(i);
+            ++i;
+            if (!p.isRemoved()) {
+                remaining.add(p);
+            }
         }
         
         return allConnected(connected, remaining);

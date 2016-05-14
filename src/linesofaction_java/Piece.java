@@ -14,7 +14,7 @@ public class Piece implements Comparable<Piece>{
     private int x;
     private int y;
     private Player p;
-
+    private boolean removed;
     
     // PUBLIC
     
@@ -23,12 +23,20 @@ public class Piece implements Comparable<Piece>{
         this.x = x;
         this.y = y;
         this.p = p;
+        this.removed = false;
+    }
+    
+    public Piece(int x, int y, Player p, boolean b) {
+        this.x = x;
+        this.y = y;
+        this.p = p;
+        this.removed = b;
     }
     
     // Copy Constructor
     public Piece(Piece rhs, Player p) {
 //        this(rhs.getX(), rhs.getY(), new Player(rhs.getPlayer()));
-        this(rhs.getX(), rhs.getY(), p);
+        this(rhs.getX(), rhs.getY(), p, rhs.isRemoved());
     }
     
     public int getX() {
@@ -37,6 +45,10 @@ public class Piece implements Comparable<Piece>{
     
     public int getY() {
         return y;
+    }
+    
+    public boolean isRemoved() {
+        return removed;
     }
     
     public void setX(int newX) {
@@ -50,6 +62,10 @@ public class Piece implements Comparable<Piece>{
     public void setPos(int newX, int newY) {
         setX(newX);
         setY(newY);
+    }
+    
+    public void setRemoved(boolean b) {
+        removed = b;
     }
     
     public Player getPlayer() {
