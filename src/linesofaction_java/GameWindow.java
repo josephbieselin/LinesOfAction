@@ -1665,8 +1665,6 @@ public class GameWindow extends javax.swing.JFrame {
         pruningMax = 0;
         pruningMin = 0;        
         
-        
-        
         /*
         Create temp Players with Piece lists identical to the current state
         to test for MIN & MAX values without. This is done as to not change
@@ -1701,29 +1699,18 @@ public class GameWindow extends javax.swing.JFrame {
     }
 
     // returns a utility value for the best possible move
-    private int MAX_VALUE(Map<Integer, PieceAndDir> state, Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
-        /* Terminal Test to see if either Player won */
-        // User Player checked first since MAX_VALUE will be called after User moves
-        if (checkWin(tempUserPlayer)) {
-            return MIN;
-        }
-        else if (checkWin(tempCompPlayer)) {
-            return MAX;
-        }
+    private int MAX_VALUE(Map<Integer, PieceAndDir> state, Map<Integer, List<String>> seen, int alpha, int beta, int dpth) {
+        /*
+        This initial call to MAX_VALUE will never start off with a terminal condition.
+        It is only called when the computer's turn starts.
+        */
  
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
+        // Root node depth is 0
+        ++nodesGenerated; // root node is a node generated
+        
         /* Update currentPlayer to test moves for temp AI Player */
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
         currentPlayer = tempCompPlayer;
 
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        /* CUTOFF TEST USING TIMED LIMIT OR DEPTH LIMIT */
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
-        
         // v is initially the minimum possible value
         int v = MIN;
         
@@ -1739,16 +1726,12 @@ public class GameWindow extends javax.swing.JFrame {
     
         // Test every Piece for currentPlayer
         for (Piece p : tempCompPlayer.getPieces()) {
-        	// If the current Piece is not actually on the board to be tested, go to the next Piece
-        	if (p.isRemoved()) {
-                    continue;
-        	}
+            // If the current Piece is not actually on the board to be tested, go to the next Piece
+            if (p.isRemoved()) {
+                continue;
+            }
 
-            ////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////
             /* Update selectedPiece to test moves for 1 of the Pieces */
-            ////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////
             selectedPiece = p;
             
             // original x,y position of the selectedPiece to move
@@ -1769,8 +1752,11 @@ public class GameWindow extends javax.swing.JFrame {
                     repeatedState = checkState(tempGameBoard, seen, "MAX");
                     // State has not been seen already so call MIN_VALUE
                     if (!repeatedState) {
+                        // a new state has been reached so inc nodesGenerated
+                        ++nodesGenerated;
+                        
                         // Call MIN_VALUE and update v if needed
-                        v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
+                        v = Math.max(v, MIN_VALUE(seen, alpha, beta, dpth+1));
                         
                         // Reset values to current MAX_VALUE call's values
                         currentPlayer = tempCompPlayer;
@@ -1799,6 +1785,8 @@ public class GameWindow extends javax.swing.JFrame {
                     
                     // Return v if we've hit the max possible utility in this tree
                     if (v >= beta) {
+                        // Pruning in MAX_VALUE happened so inc pruningMax
+                        ++pruningMax;
                         return v;
                     }
                     // update alpha 
@@ -1811,7 +1799,10 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
     // returns a utility value for the best possible move
-    private int MAX_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
+    private int MAX_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int dpth) {
+        // Update depth if needed
+        depth = Math.max(depth, dpth);
+        
         /* Terminal Test to see if either Player won */
         // User Player checked first since MAX_VALUE will be called after User moves
         if (checkWin(tempUserPlayer)) {
@@ -1823,18 +1814,14 @@ public class GameWindow extends javax.swing.JFrame {
  
         // check for cutoff conditions
         if ((depth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
+            // EVAL called in MAX_VALUE so inc evalCalledMax
+            ++evalCalledMax;
             return EVAL(tempGameBoard, tempCompPlayer, tempUserPlayer);
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
         /* Update currentPlayer to test moves for AI Player */
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
         currentPlayer = tempCompPlayer;
 
-
-        
         // v is initially the minimum possible value
         int v = MIN;
         
@@ -1854,12 +1841,8 @@ public class GameWindow extends javax.swing.JFrame {
             if (p.isRemoved()) {
                 continue;
             }
-            
-            ////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////
+
             /* Update selectedPiece to test moves for 1 of the Pieces */
-            ////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////
             selectedPiece = p;
             
             // original x,y position of the selectedPiece to move
@@ -1880,8 +1863,11 @@ public class GameWindow extends javax.swing.JFrame {
                     repeatedState = checkState(tempGameBoard, seen, "MAX");
                     // State has not been seen already so call MIN_VALUE
                     if (!repeatedState) {
+                        // a new state has been reached so inc nodesGenerated
+                        ++nodesGenerated;
+                        
                         // Call MIN_VALUE and update v if needed
-                        v = Math.max(v, MIN_VALUE(seen, alpha, beta, depth+1));
+                        v = Math.max(v, MIN_VALUE(seen, alpha, beta, dpth+1));
                         
                         // Reset values to current MAX_VALUE call's values
                         currentPlayer = tempCompPlayer;
@@ -1907,6 +1893,8 @@ public class GameWindow extends javax.swing.JFrame {
                     
                     // Return v if we've hit the max possible utility in this tree
                     if (v >= beta) {
+                        // Pruning in MAX_VALUE happened so inc pruningMax
+                        ++pruningMax;
                         return v;
                     }
                     // update alpha 
@@ -1919,7 +1907,10 @@ public class GameWindow extends javax.swing.JFrame {
     }
     
     // returns a utility value for the worst possible move
-    private int MIN_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int depth) {
+    private int MIN_VALUE(Map<Integer, List<String>> seen, int alpha, int beta, int dpth) {
+        // Update depth if needed
+        depth = Math.max(depth, dpth);
+
         /* Terminal Test to see if either Player won */
         // Comp Player checked first since MIN_VALUE will be called after Comp moves
         if (checkWin(tempCompPlayer)) {
@@ -1931,14 +1922,12 @@ public class GameWindow extends javax.swing.JFrame {
  
         // check for cutoff conditions
         if ((depth >= MAX_DEPTH) || (((System.nanoTime() - startTime)/1000000000) >= MAX_TIME)) {
+            // EVAL called in MIN_VALUE so inc evalCalledMin
+            ++evalCalledMin;
             return EVAL(tempGameBoard, tempCompPlayer, tempUserPlayer);
         }
         
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
         /* Update currentPlayer to test moves for AI Player */
-        ////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////
         currentPlayer = tempUserPlayer;
 
         // v is initially the maximum possible value
@@ -1961,11 +1950,7 @@ public class GameWindow extends javax.swing.JFrame {
                 continue;
             }  
             
-            ////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////
             /* Update selectedPiece to test moves for 1 of the Pieces */
-            ////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////
             selectedPiece = p;
             
             // original x,y position of the selectedPiece to move
@@ -1985,8 +1970,11 @@ public class GameWindow extends javax.swing.JFrame {
                     repeatedState = checkState(tempGameBoard, seen, "MIN");
                     // State has not been seen already so call MIN_VALUE
                     if (!repeatedState) {
+                        // a new state has been reached so inc nodesGenerated
+                        ++nodesGenerated;
+                        
                         // Call MAX_VALUE and update v if needed
-                        v = Math.min(v, MAX_VALUE(seen, alpha, beta, depth+1));
+                        v = Math.min(v, MAX_VALUE(seen, alpha, beta, dpth+1));
                         
                         // Reset values to current MIN_VALUE call's values
                         currentPlayer = tempUserPlayer;
@@ -2012,6 +2000,8 @@ public class GameWindow extends javax.swing.JFrame {
                     
                     // Return v if we've hit the min possible utility in this tree
                     if (v <= alpha) {
+                        // Pruning in MIN_VALUE happened so inc pruningMin
+                        ++pruningMin;
                         return v;
                     }
                     // update beta 
