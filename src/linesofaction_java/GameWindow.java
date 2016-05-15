@@ -2225,7 +2225,7 @@ public class GameWindow extends javax.swing.JFrame {
             for (int j = 0; j < avgPosXs.length; ++j) {
                 if (i != j) {
                     // Distance between 2 points formula used
-                    util += distance(avgPosXs[i], avgPosXs[j], avgPosYs[i], avgPosYs[j]);
+                    util -= distance(avgPosXs[i], avgPosXs[j], avgPosYs[i], avgPosYs[j]);
                     /*
                     If the mean position of disjointed connected Lists for compP are far
                     apart, that is generally bad for the AI.
